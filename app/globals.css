@@ -1,26 +1,104 @@
 @import "tailwindcss";
 
+/*
+ * Cores da marca Marcaí (docs/marca.md).
+ * Os tokens ficam em variáveis CSS para que, na Etapa 2, cada negócio
+ * possa trocar a cor principal, o destaque, o fundo e os cantos.
+ */
+
+/* O tema escuro é escolhido pelo negócio (Aparência), não pelo sistema. */
+@custom-variant dark (&:where([data-tema="escuro"], [data-tema="escuro"] *));
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --amarelo: #ffd23f;
+  --amarelo-suave: #fff1b8;
+  --petroleo: #0f3d3e;
+  --sobre-amarelo: #0f3d3e;
+  --sobre-petroleo: #ffffff;
+  --fundo: #f1f4f2;
+  --superficie: #ffffff;
+  --cinza-suave: #e6eeea;
+  --menta-suave: #ddefe8;
+  --pessego-suave: #ffe3d3;
+  --linha: #dce5e1;
+  --texto: #0f3d3e;
+  --texto-suave: #4f5f5c;
+  --sucesso: #1c6e45;
+  --erro: #b3261e;
+  color-scheme: light;
+}
+
+[data-tema="escuro"] {
+  --fundo: #0b1c1c;
+  --superficie: #122929;
+  --cinza-suave: #1c3637;
+  --linha: #234041;
+  --texto: #eef4f2;
+  --texto-suave: #9db2ae;
+  --amarelo-suave: #3a3112;
+  --menta-suave: #173a33;
+  --pessego-suave: #3f2a20;
+  color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Cores: bg-amarelo, text-texto-suave, border-linha... */
+  --color-amarelo: var(--amarelo);
+  --color-amarelo-suave: var(--amarelo-suave);
+  --color-petroleo: var(--petroleo);
+  --color-sobre-amarelo: var(--sobre-amarelo);
+  --color-sobre-petroleo: var(--sobre-petroleo);
+  --color-fundo: var(--fundo);
+  --color-superficie: var(--superficie);
+  --color-cinza-suave: var(--cinza-suave);
+  --color-menta-suave: var(--menta-suave);
+  --color-pessego-suave: var(--pessego-suave);
+  --color-linha: var(--linha);
+  --color-texto: var(--texto);
+  --color-texto-suave: var(--texto-suave);
+  --color-sucesso: var(--sucesso);
+  --color-erro: var(--erro);
+
+  /* Fonte da interface */
+  --font-sans: var(--font-onest), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@theme {
+  /* Escala de texto: text-display, text-titulo, text-subtitulo, text-corpo, text-legenda */
+  --text-display: 48px;
+  --text-display--line-height: 52px;
+  --text-display--font-weight: 800;
+  --text-titulo: 34px;
+  --text-titulo--line-height: 40px;
+  --text-titulo--font-weight: 800;
+  --text-subtitulo: 22px;
+  --text-subtitulo--line-height: 28px;
+  --text-subtitulo--font-weight: 700;
+  --text-corpo: 15px;
+  --text-corpo--line-height: 22px;
+  --text-legenda: 13px;
+  --text-legenda--line-height: 18px;
+
+  /* Cantos: rounded-etiqueta, rounded-botao, rounded-cartao, rounded-destaque */
+  --radius-etiqueta: 8px;
+  --radius-botao: 12px;
+  --radius-cartao: 16px;
+  --radius-destaque: 24px;
+
+  /* Alvo de toque mínimo: min-h-toque, min-w-toque */
+  --spacing-toque: 44px;
+}
+
+/* Gradientes (só em áreas grandes) */
+@utility bg-sol {
+  background-image: linear-gradient(135deg, #ffe27a 0%, #ffd23f 42%, #ffb38a 100%);
+}
+@utility bg-noite {
+  background-image: linear-gradient(160deg, #1a5556 0%, #0f3d3e 55%, #082526 100%);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: var(--font-sans);
 }
