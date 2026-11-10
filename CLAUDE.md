@@ -85,6 +85,7 @@ Detalhes em `docs/marca.md`. Resumo:
 ## Comandos
 
 - `npm run dev` · `npm test` · `npm run lint`
+- `npm run test:db` testa migrations, seed e regras do banco num Postgres local descartável (`URL_BANCO_TESTE`)
 - `npx supabase db push` para aplicar migrations
 
 ## Como trabalhar neste projeto
