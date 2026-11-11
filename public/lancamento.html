@@ -1,0 +1,964 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Marcaí · atendente virtual com agenda</title>
+<meta name="description" content="Atendente virtual que responde no WhatsApp e no Instagram e marca na sua agenda. Para salões, clínicas, manicures e barbearias.">
+<meta property="og:title" content="Marcaí · Seu cliente pede. Eu marco.">
+<meta property="og:description" content="A Lia responde seus clientes no WhatsApp e no Instagram e marca na sua agenda enquanto você atende.">
+<meta name="theme-color" content="#0B1A30">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M14 8h36a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H28l-13 10V50a10 10 0 0 1-11-10V18A10 10 0 0 1 14 8z' fill='%2314B8C4'/%3E%3Cpath d='M20 29l8 8 16-16' fill='none' stroke='%230F2340' stroke-width='5.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+</head>
+<body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a página inteira é uma conversa com a Lia. Três colunas no computador:
+   trilho de capítulos (esq.), a conversa (centro) e a agenda que vai enchendo (dir.).
+   No celular, só a conversa, com a agenda num botão flutuante. Visual único, marinho escuro. */
+:root{
+  --bg:#0B1A30; --bg2:#0F2340; --lia:#16304F; --lia-borda:#23426B; --linha-esc:#1E3555;
+  --ciano:#14B8C4; --ciano-hover:#2CCAD5; --ciano-texto:#0B7F8A; --ciano-gelo:#DFF6F7;
+  --ambar:#FFB547; --ambar-suave:#FFF1DA;
+  --claro:#EAF1F6; --claro-suave:#9FB2C8;
+  --sup:#FFFFFF; --fundo:#F4F7F9; --cinza:#E9EEF2; --linha:#DEE6EC; --marinho:#0F2340; --suave:#55657A;
+  --f:"Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r-md:12px; --r-lg:18px; --r-xl:24px;
+  --demo-p:#0F2340; --demo-a:#14B8C4; --demo-on-p:#FFFFFF; --demo-on-a:#0F2340; --demo-soft:#DFF6F7;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:84px}
+body{background:var(--bg);color:var(--claro);font-family:var(--f);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ciano);outline-offset:3px;border-radius:6px}
+h1,h2,h3,p{margin:0}
+.num{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* luzes de fundo */
+.ceu{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.ceu i{position:absolute;border-radius:50%}
+.ceu .a{width:900px;height:900px;right:-300px;top:-380px;background:radial-gradient(circle, rgba(20,184,196,.30) 0%, rgba(20,184,196,0) 65%);animation:d1 20s ease-in-out infinite alternate}
+.ceu .b{width:700px;height:700px;left:-300px;bottom:-360px;background:radial-gradient(circle, rgba(255,181,71,.16) 0%, rgba(255,181,71,0) 65%);animation:d2 26s ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(-160px,120px) scale(1.1)}}
+@keyframes d2{to{transform:translate(180px,-100px) scale(1.15)}}
+
+/* estrutura */
+.palco{display:grid;grid-template-columns:240px minmax(0,700px) 300px;gap:48px;justify-content:center;
+  padding-left:max(24px, env(safe-area-inset-left,0px));padding-right:max(24px, env(safe-area-inset-right,0px))}
+@media (max-width:1180px){.palco{grid-template-columns:minmax(0,700px) 280px;gap:36px}.palco .trilho{display:none}}
+@media (max-width:900px){.palco{grid-template-columns:minmax(0,1fr);padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}.palco .agenda-lado{display:none}}
+
+/* barra do celular */
+.barra{display:none;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(11,26,48,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--linha-esc);
+  padding:10px max(16px, env(safe-area-inset-right,0px)) 10px max(16px, env(safe-area-inset-left,0px));align-items:center;justify-content:space-between}
+@media (max-width:1180px){.barra{display:flex}}
+
+.logo{display:flex;align-items:center;gap:10px;color:var(--claro);text-decoration:none}
+.logo b{font-weight:600;font-size:23px;letter-spacing:-.045em}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:0 20px;border-radius:var(--r-md);border:0;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap;transition:background .2s, transform .2s}
+.btn-ciano{background:var(--ciano);color:var(--marinho)}
+.btn-ciano:hover{background:var(--ciano-hover);transform:translateY(-1px)}
+.btn-marinho{background:var(--marinho);color:#FFFFFF}
+.btn-marinho:hover{background:#21406A}
+.btn-claro{background:transparent;border:1px solid var(--linha);color:var(--marinho)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.barra .btn{min-height:42px;padding:0 14px;font-size:15px}
+
+/* trilho de capítulos */
+.trilho{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:28px;padding-block:28px}
+.capitulos{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:2px;position:relative}
+.capitulos::before{content:"";position:absolute;left:11px;top:14px;bottom:14px;width:2px;background:var(--linha-esc)}
+.capitulos a{position:relative;display:flex;align-items:center;gap:14px;padding:8px 0;color:var(--claro-suave);text-decoration:none;font-size:15px;font-weight:500;transition:color .25s}
+.capitulos a::before{content:"";width:24px;height:24px;border-radius:50%;background:var(--bg);border:2px solid var(--linha-esc);flex:none;transition:all .25s;z-index:1}
+.capitulos a:hover{color:var(--claro)}
+.capitulos a.lido::before{background:var(--lia-borda);border-color:var(--lia-borda)}
+.capitulos a.atual{color:var(--claro)}
+.capitulos a.atual::before{background:var(--ciano);border-color:var(--ciano);box-shadow:0 0 0 5px rgba(20,184,196,.18)}
+.trilho .canais{margin-top:auto;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--claro-suave)}
+.trilho .canais span{display:flex;align-items:center;gap:8px}
+
+/* conversa */
+.conversa{padding-block:40px 120px;min-width:0;display:flex;flex-direction:column}
+.cap{display:flex;flex-direction:column;gap:12px;padding-block:44px}
+.cap + .cap{border-top:1px dashed var(--linha-esc)}
+.hora-cap{align-self:center;font-size:13px;color:var(--claro-suave);background:rgba(22,48,79,.6);border:1px solid var(--linha-esc);border-radius:99px;padding:3px 12px}
+.msg{max-width:88%;display:flex;flex-direction:column;gap:6px}
+.msg.lia{align-self:flex-start}
+.msg.voce{align-self:flex-end;align-items:flex-end}
+.quem{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--claro-suave)}
+.quem .av{width:26px;height:26px;border-radius:50%;background:var(--ciano);display:grid;place-items:center;flex:none}
+.bolha{padding:12px 16px;border-radius:20px;font-size:17px;line-height:1.5;white-space:pre-line}
+.lia .bolha{background:var(--lia);border:1px solid var(--lia-borda);border-top-left-radius:6px;color:var(--claro)}
+.voce .bolha{background:#FFFFFF;color:var(--marinho);border-bottom-right-radius:6px}
+.bolha.grande{font-size:clamp(46px,7.2vw,92px);line-height:.96;letter-spacing:-.05em;font-weight:600;padding:26px 30px 30px;border-radius:32px;border-top-left-radius:10px;white-space:normal}
+.bolha.grande em{font-style:normal;color:var(--ciano)}
+.cartao{background:var(--sup);color:var(--marinho);border-radius:var(--r-xl);padding:20px;width:100%;max-width:640px}
+.msg.larga{max-width:100%;width:100%}
+.respostas{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.resp{display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--lia-borda);background:transparent;color:var(--claro);text-decoration:none;font-weight:500;font-size:15px;cursor:pointer;transition:background .2s,border-color .2s}
+.resp:hover{background:var(--lia);border-color:var(--ciano)}
+.digitando{align-self:flex-start;display:flex;gap:5px;padding:14px 16px;background:var(--lia);border:1px solid var(--lia-borda);border-radius:20px;border-top-left-radius:6px}
+.digitando i{width:7px;height:7px;border-radius:50%;background:var(--claro-suave);animation:bob 1.1s infinite}
+.digitando i:nth-child(2){animation-delay:.15s}.digitando i:nth-child(3){animation-delay:.3s}
+@keyframes bob{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.chega{transform:translateY(18px) scale(.985);transform-origin:left bottom}
+.voce.chega{transform-origin:right bottom}
+.anima{transition:transform .55s cubic-bezier(.2,.8,.2,1)}
+
+/* fila de mensagens chegando (abertura) */
+.fila{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px;width:100%;max-width:520px}
+.fila li{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:12px;align-items:center;background:rgba(22,48,79,.55);border:1px solid var(--linha-esc);border-radius:16px;padding:10px 14px;transition:transform .5s ease, opacity .5s ease}
+.fila .ico{width:34px;height:34px;border-radius:10px;background:var(--bg2);border:1px solid var(--lia-borda);display:grid;place-items:center;color:var(--ciano)}
+.fila .txt{min-width:0;font-size:15px;line-height:1.35}
+.fila .txt small{display:block;color:var(--claro-suave);font-size:12.5px}
+.fila .txt span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fila .st{font-size:13px;font-weight:600;border-radius:99px;padding:4px 10px;white-space:nowrap;background:rgba(159,178,200,.12);color:var(--claro-suave)}
+.fila li.ok .st{background:var(--ambar);color:var(--marinho)}
+.fila li.sai{opacity:0;transform:translateY(-10px)}
+.publico{font-size:15px;color:var(--claro-suave);margin-top:4px}
+
+/* troca de canal */
+.abas{display:inline-flex;gap:4px;background:var(--cinza);padding:4px;border-radius:12px}
+.abas button{border:0;background:transparent;color:var(--suave);padding:8px 14px;border-radius:9px;cursor:pointer;font-weight:500;font-size:15px;min-height:40px;display:inline-flex;align-items:center;gap:8px}
+.abas button[aria-pressed="true"]{background:var(--sup);color:var(--marinho);font-weight:600;box-shadow:0 1px 3px rgba(15,35,64,.15)}
+.mini{margin-top:16px;border-radius:20px;overflow:hidden;border:1px solid var(--linha);transition:border-radius .4s}
+.mini .topo{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--marinho);color:#FFFFFF;transition:background .4s}
+.mini .topo .av{width:32px;height:32px;border-radius:50%;background:var(--ciano);display:grid;place-items:center}
+.mini .topo b{display:block;font-size:15px;font-weight:600}
+.mini .topo small{font-size:12.5px;color:var(--claro-suave)}
+.mini .corpo{background:#EEF3F6;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:150px;transition:background .4s}
+.mini .c,.mini .l{max-width:86%;padding:9px 13px;font-size:15px;line-height:1.4;transition:border-radius .4s, background .4s}
+.mini .c{align-self:flex-end;background:#FFFFFF;border-radius:16px 16px 4px 16px}
+.mini .l{align-self:flex-start;background:var(--marinho);color:#FFFFFF;border-radius:16px 16px 16px 4px}
+.mini.insta{border-radius:28px}
+.mini.insta .topo{background:#FFFFFF;color:var(--marinho);border-bottom:1px solid var(--linha)}
+.mini.insta .topo small{color:var(--suave)}
+.mini.insta .corpo{background:#FFFFFF}
+.mini.insta .c{background:var(--cinza);border-radius:22px}
+.mini.insta .l{border-radius:22px}
+
+/* tom humano */
+.exemplo{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.exemplo .c{align-self:flex-end;background:var(--cinza);color:var(--marinho);border-radius:16px 16px 4px 16px;padding:9px 13px;max-width:86%;font-size:15px}
+.exemplo .l{align-self:flex-start;background:var(--marinho);color:#FFFFFF;border-radius:16px 16px 16px 4px;padding:9px 13px;max-width:90%;font-size:15px}
+.tracos{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.tracos li{display:flex;gap:10px;align-items:flex-start}
+.tracos svg{flex:none;margin-top:4px;color:var(--ciano)}
+
+/* agenda (cartão e lateral) */
+.agenda-lado{position:sticky;top:0;height:100vh;padding-block:28px;display:flex;flex-direction:column;gap:14px}
+.ag{background:var(--sup);color:var(--marinho);border-radius:var(--r-xl);padding:18px}
+.ag-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ag-head b{font-size:16px;font-weight:600}
+.ag-head span{font-size:13px;color:var(--suave)}
+.ag ul{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column}
+.ag li{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--linha);font-size:14.5px}
+.ag li:first-child{border-top:0}
+.ag .h{font-weight:600;font-variant-numeric:tabular-nums;text-align:center;border-radius:8px;padding:3px 0;background:var(--cinza)}
+.ag li.lia .h{background:var(--ciano-gelo)}
+.ag li .n{min-width:0}
+.ag li .n small{display:block;color:var(--suave);font-size:12.5px}
+.ag li.novo{animation:pisca 1.8s ease}
+@keyframes pisca{0%{background:var(--ambar-suave)}100%{background:transparent}}
+.contador{display:flex;align-items:baseline;gap:10px;color:var(--claro-suave);font-size:14px}
+.contador b{font-size:40px;font-weight:600;letter-spacing:-.04em;color:var(--claro);font-variant-numeric:tabular-nums}
+.alerta{margin-top:12px;background:var(--ambar-suave);border-radius:14px;padding:12px 14px;font-size:14.5px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.alerta .btn{min-height:40px;padding:0 14px;font-size:14px}
+
+/* pílula da agenda no celular */
+.pilula{display:none;position:fixed;right:max(16px, env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:25;background:var(--sup);color:var(--marinho);border:0;border-radius:99px;padding:10px 16px 10px 10px;box-shadow:0 18px 40px -16px rgba(0,0,0,.6);font-weight:600;align-items:center;gap:10px;cursor:pointer;min-height:48px}
+.pilula .n{background:var(--ciano);border-radius:99px;min-width:30px;height:30px;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+@media (max-width:900px){.pilula{display:inline-flex}}
+.folha{position:fixed;inset:auto 0 0 0;z-index:26;padding:16px max(16px, env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px));background:rgba(11,26,48,.96);border-top:1px solid var(--linha-esc);border-radius:24px 24px 0 0}
+.folha .fechar{margin-top:10px;width:100%}
+
+/* teste ao vivo */
+.seg{display:inline-flex;gap:4px;background:var(--cinza);padding:4px;border-radius:12px;margin-bottom:12px}
+.seg button{border:0;background:transparent;color:var(--suave);padding:8px 14px;border-radius:9px;cursor:pointer;font-weight:500;font-size:15px;min-height:40px}
+.seg button[aria-pressed="true"]{background:var(--sup);color:var(--marinho);font-weight:600;box-shadow:0 1px 3px rgba(15,35,64,.15)}
+.lab{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,220px);gap:14px}
+@media (max-width:640px){.lab{grid-template-columns:minmax(0,1fr)}}
+.fone .screen{background:#EEF3F6;border-radius:20px;overflow:hidden;display:flex;flex-direction:column;height:440px;border:1px solid var(--linha)}
+.chat-head{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--demo-p);color:var(--demo-on-p)}
+.chat-head .av{width:34px;height:34px;border-radius:50%;background:var(--demo-a);color:var(--demo-on-a);display:grid;place-items:center;font-weight:700;flex:none}
+.chat-head .who{flex:1;min-width:0}
+.chat-head .who b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;font-size:15px}
+.chat-head small{opacity:.78;font-size:12px}
+.reset{border:1px solid currentColor;background:transparent;color:inherit;opacity:.85;border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer;min-height:32px}
+.msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.b{max-width:86%;padding:8px 12px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14.5px;line-height:1.42;animation:entra .3s ease both}
+@keyframes entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.b.in{align-self:flex-end;background:#FFFFFF;border-radius:16px 16px 4px 16px}
+.b.out{align-self:flex-start;background:var(--demo-p);color:var(--demo-on-p);border-radius:16px 16px 16px 4px}
+.b.sys{align-self:center;background:var(--demo-soft);color:var(--marinho);border-radius:10px;font-size:12.5px;text-align:center;max-width:94%;font-weight:600}
+.b.err{align-self:center;background:#FBE4E2;color:#8E1F18;border-radius:10px;font-size:12.5px;text-align:center}
+.typing{align-self:flex-start;background:#FFFFFF;border-radius:16px;padding:10px 13px;display:flex;gap:4px}
+.typing i{width:6px;height:6px;border-radius:50%;background:#8DA0B5;animation:bob 1.1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.chips{display:flex;gap:6px;flex-wrap:wrap;padding:0 12px 8px}
+.chip{border:1px solid #B9C6D6;background:#FFFFFF;color:var(--marinho);border-radius:99px;padding:5px 11px;font-size:13px;cursor:pointer;min-height:34px}
+.chip:hover{border-color:var(--ciano-texto);color:var(--ciano-texto)}
+.composer{display:flex;gap:8px;padding:9px;background:#FFFFFF}
+.composer input{flex:1;min-width:0;border:1px solid var(--linha);background:var(--fundo);border-radius:99px;padding:9px 14px;color:var(--marinho)}
+.composer button{border:0;background:var(--demo-a);color:var(--demo-on-a);border-radius:99px;padding:0 16px;font-weight:600;cursor:pointer;min-height:42px}
+.composer button:disabled{opacity:.5;cursor:default}
+.dono{background:var(--fundo);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.owner-head b{display:block;font-size:14.5px;font-weight:600}
+.owner-head span{font-size:12.5px;color:var(--suave)}
+.slots{display:flex;flex-direction:column;max-height:300px;overflow-y:auto}
+.slot{display:grid;grid-template-columns:52px minmax(0,1fr);gap:8px;align-items:center;font-size:13.5px;padding:7px 0;border-top:1px solid var(--linha)}
+.slot:first-child{border-top:0}
+.slot .h{padding:3px 4px;border-radius:7px;font-weight:600;font-variant-numeric:tabular-nums;text-align:center}
+.slot .h.ia{background:var(--ciano-gelo)}
+.slot .h.dono{background:var(--cinza)}
+.slot .n{min-width:0;overflow-wrap:anywhere}
+.slot .p{display:none}
+.slot.new{animation:pisca 1.6s ease}
+.slot.new .n{font-weight:600}
+.note{font-size:13px;color:var(--suave)}
+
+/* planos */
+.planos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%}
+@media (max-width:760px){.planos{grid-template-columns:minmax(0,1fr)}}
+.plano{background:var(--sup);color:var(--marinho);border-radius:22px;padding:22px 20px;display:flex;flex-direction:column;gap:14px;position:relative;border:2px solid transparent}
+.plano.destaque{border-color:var(--ciano);box-shadow:0 0 0 6px rgba(20,184,196,.15)}
+.plano .selo{position:absolute;top:-13px;left:18px;background:var(--ciano);color:var(--marinho);font-size:13px;font-weight:600;border-radius:99px;padding:3px 10px}
+.plano h3{font-size:20px;font-weight:600;letter-spacing:-.02em}
+.plano .para{font-size:14px;color:var(--suave);margin-top:-8px}
+.preco{display:flex;align-items:baseline;gap:4px}
+.preco b{font-size:42px;font-weight:600;letter-spacing:-.04em;font-variant-numeric:tabular-nums;line-height:1}
+.preco span{color:var(--suave);font-size:15px}
+.plano ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.plano li{display:flex;gap:8px;align-items:flex-start}
+.plano li svg{flex:none;margin-top:4px;color:var(--ciano-texto)}
+.plano .btn{margin-top:auto;width:100%}
+
+/* lista de espera */
+form.lista{display:flex;flex-direction:column;gap:12px}
+.field{display:flex;flex-direction:column;gap:5px}
+.field label{font-size:14px;font-weight:500}
+.field input,.field select{background:var(--fundo);border:1px solid var(--linha);border-radius:12px;padding:11px 13px;min-height:48px;color:var(--marinho)}
+.field input:focus,.field select:focus{border-color:var(--ciano-texto);outline:2px solid var(--ciano-gelo);outline-offset:0}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+@media (max-width:480px){.row2{grid-template-columns:minmax(0,1fr)}}
+.form-msg{font-size:14px;min-height:1.3em}
+.form-msg.err{color:#C0362C}
+.done{display:flex;flex-direction:column;gap:6px}
+.done b{font-size:22px;font-weight:600;letter-spacing:-.02em}
+
+footer.rodape{border-top:1px solid var(--linha-esc);padding-block:28px 40px;margin-top:20px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;color:var(--claro-suave);font-size:14px}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .ceu i,.digitando i,.typing i{animation:none!important}
+  .chega{transform:none}
+  .b,.ag li.novo,.slot.new{animation:none}
+}
+</style>
+
+<div class="ceu" aria-hidden="true"><i class="a"></i><i class="b"></i></div>
+
+<header class="barra">
+  <a class="logo" href="#oi" aria-label="Marcaí, início"><svg width="30" height="30" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h36a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H28l-13 10V50a10 10 0 0 1-11-10V18A10 10 0 0 1 14 8z" fill="#14B8C4"/><path d="M22 3v10M42 3v10" stroke="#14B8C4" stroke-width="5" stroke-linecap="round"/><path d="M20 29l8 8 16-16" fill="none" stroke="#0F2340" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg><b>marcaí</b></a>
+  <a class="btn btn-ciano" href="#lista">Quero usar</a>
+</header>
+
+<div class="palco">
+  <aside class="trilho" aria-label="Capítulos da conversa">
+    <a class="logo" href="#oi" aria-label="Marcaí, início"><svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h36a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H28l-13 10V50a10 10 0 0 1-11-10V18A10 10 0 0 1 14 8z" fill="#14B8C4"/><path d="M22 3v10M42 3v10" stroke="#14B8C4" stroke-width="5" stroke-linecap="round"/><path d="M20 29l8 8 16-16" fill="none" stroke="#0F2340" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg><b>marcaí</b></a>
+    <nav aria-label="Capítulos">
+      <ol class="capitulos" id="capitulos">
+        <li><a href="#oi">Oi, eu sou a Lia</a></li>
+        <li><a href="#canais">WhatsApp e Instagram</a></li>
+        <li><a href="#gente">Fala como gente</a></li>
+        <li><a href="#agenda">Sua agenda</a></li>
+        <li><a href="#teste">Teste comigo</a></li>
+        <li><a href="#planos">Planos</a></li>
+        <li><a href="#lista">Entrar na lista</a></li>
+        <li><a href="#duvidas">Dúvidas</a></li>
+      </ol>
+    </nav>
+    <a class="btn btn-ciano" href="#lista">Quero usar</a>
+    <div class="canais">
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.2 18.6z"/></svg>WhatsApp Business</span>
+      <span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1" fill="currentColor"/></svg>Instagram Direct</span>
+    </div>
+  </aside>
+
+  <main class="conversa" id="conversa">
+
+    <section class="cap" id="oi" aria-label="Oi, eu sou a Lia">
+      <span class="hora-cap">Hoje</span>
+      <div class="msg lia">
+        <span class="quem"><span class="av"><svg width="16" height="16" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h36a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H28l-13 10V50a10 10 0 0 1-11-10V18A10 10 0 0 1 14 8z" fill="#0F2340"/><path d="M20 29l8 8 16-16" fill="none" stroke="#14B8C4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Lia, atendente da Marcaí</span>
+        <h1 class="bolha grande">Seu cliente pede. <em>Eu marco.</em></h1>
+      </div>
+      <div class="msg lia">
+        <p class="bolha">Sou a atendente virtual da Marcaí. Respondo seus clientes no WhatsApp e no Instagram, mostro os horários livres e marco na sua agenda enquanto você atende.</p>
+      </div>
+      <div class="msg lia larga">
+        <ul class="fila" id="fila" aria-label="Mensagens chegando e sendo marcadas">
+          <li class="ok"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.2 18.6z"/></svg></span><span class="txt"><small>WhatsApp · Carla</small><span>tem horário pra escova sábado?</span></span><span class="st">Marcado sáb 09:00</span></li>
+          <li class="ok"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/></svg></span><span class="txt"><small>Instagram · @renata.lima</small><span>vi o post da limpeza de pele, quanto tá?</span></span><span class="st">Marcado ter 15:30</span></li>
+          <li class="ok"><span class="ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.2 18.6z"/></svg></span><span class="txt"><small>WhatsApp · Lucas</small><span>consegue me encaixar hoje depois das 18h?</span></span><span class="st">Marcado hoje 18:30</span></li>
+        </ul>
+      </div>
+      <div class="msg lia">
+        <p class="bolha">Por onde quer começar?</p>
+        <div class="respostas">
+          <a class="resp" href="#canais">Funciona no Instagram?</a>
+          <a class="resp" href="#gente">Parece robô?</a>
+          <a class="resp" href="#planos">Quanto custa?</a>
+          <a class="resp" href="#teste">Quero testar</a>
+        </div>
+      </div>
+      <p class="publico">Para salões, clínicas de estética, manicures, barbearias, estúdios de sobrancelha e cílios.</p>
+    </section>
+
+    <section class="cap" id="canais" aria-label="WhatsApp e Instagram" data-marca="1">
+      <div class="msg voce"><p class="bolha">Funciona no Instagram também?</p></div>
+      <div class="msg lia"><p class="bolha">Funciona. Atendo no WhatsApp e no Direct do Instagram, com o mesmo jeito de falar e a mesma agenda. Toque para trocar:</p></div>
+      <div class="msg lia larga">
+        <div class="cartao">
+          <div class="abas" role="group" aria-label="Escolher canal">
+            <button type="button" data-canal="whats" aria-pressed="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.2 18.6z"/></svg>WhatsApp</button>
+            <button type="button" data-canal="insta" aria-pressed="false"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/></svg>Instagram</button>
+          </div>
+          <div class="mini" id="mini" aria-live="polite">
+            <div class="topo"><span class="av"><svg width="18" height="18" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h36a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H28l-13 10V50a10 10 0 0 1-11-10V18A10 10 0 0 1 14 8z" fill="#0F2340"/><path d="M20 29l8 8 16-16" fill="none" stroke="#14B8C4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b id="miniNome">Studio Ana Luz</b><small id="miniCanal">WhatsApp Business · online</small></span></div>
+            <div class="corpo">
+              <span class="c" id="miniC">oi! tem horário pra escova no sábado?</span>
+              <span class="l" id="miniL">Oi, Carla! Sábado tenho 09:00 ou 10:30. A escova sai R$ 50. Qual prefere?</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="msg lia"><p class="bolha">Quem chega pelo story, pela bio ou por um anúncio já cai na conversa e sai com horário marcado.</p></div>
+    </section>
+
+    <section class="cap" id="gente" aria-label="Fala como gente" data-marca="2">
+      <div class="msg voce"><p class="bolha">Mas não vai parecer robô?</p></div>
+      <div class="msg lia"><p class="bolha">Leia e me diga. Eu falo do jeito do seu negócio:</p></div>
+      <div class="msg lia larga">
+        <div class="cartao">
+          <div class="abas" role="group" aria-label="Escolher tipo de negócio">
+            <button type="button" data-tom="salao" aria-pressed="true">Salão</button>
+            <button type="button" data-tom="clinica" aria-pressed="false">Clínica</button>
+            <button type="button" data-tom="barbearia" aria-pressed="false">Barbearia</button>
+          </div>
+          <div class="exemplo" id="exemplo" aria-live="polite">
+            <span class="c">oi! a Ana tem horário pra mim essa semana?</span>
+            <span class="l">Oi, Patrícia! Que bom te ver de novo. Quinta às 17:30 está livre com a Ana. Vai ser o corte de sempre?</span>
+          </div>
+        </div>
+      </div>
+      <div class="msg lia larga">
+        <div class="bolha">
+          <ul class="tracos">
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Chamo pelo nome e lembro do serviço de sempre.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Mando mensagens curtas, sem textão e sem menu de números.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Se perguntarem, digo com honestidade que sou a atendente virtual.</li>
+            <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Quando não sei uma coisa, chamo você em vez de inventar.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cap" id="agenda" aria-label="Sua agenda" data-marca="3">
+      <div class="msg voce"><p class="bolha">E eu, como acompanho?</p></div>
+      <div class="msg lia"><p class="bolha">Tudo cai na sua agenda na hora. Você vê quem eu marquei, recebe um aviso quando eu precisar de você e assume a conversa com um toque.</p></div>
+      <div class="msg lia larga">
+        <div class="cartao">
+          <div class="ag-head"><b>Hoje · Studio Ana Luz</b><span>Ana</span></div>
+          <div class="ag" style="padding:0;margin-top:4px">
+            <ul>
+              <li><span class="h">09:00</span><span class="n">Cláudia, coloração<small>marcado por você</small></span></li>
+              <li class="lia"><span class="h">14:00</span><span class="n">Bianca, pé e mão<small>marcado pela Lia no WhatsApp</small></span></li>
+              <li class="lia"><span class="h">17:30</span><span class="n">Patrícia, corte<small>marcado pela Lia no Instagram</small></span></li>
+            </ul>
+          </div>
+          <div class="alerta"><span><b>Precisa de você.</b> Luana perguntou por progressiva, que não está na sua lista de serviços.</span><button type="button" class="btn btn-marinho">Assumir conversa</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cap" id="teste" aria-label="Teste comigo" data-marca="4">
+      <div class="msg voce"><p class="bolha">Posso testar?</p></div>
+      <div class="msg lia"><p class="bolha">Agora mesmo. Escolha um negócio e fale comigo como se fosse cliente. Junto com a conversa, você vê a agenda do dono mudando.</p></div>
+      <div class="msg lia larga">
+        <div class="cartao">
+          <div class="seg" role="group" aria-label="Escolher negócio de exemplo">
+            <button type="button" data-biz="salao" aria-pressed="true">Salão</button>
+            <button type="button" data-biz="estetica" aria-pressed="false">Estética</button>
+            <button type="button" data-biz="barbearia" aria-pressed="false">Barbearia</button>
+          </div>
+          <div class="lab">
+            <div class="fone">
+              <div class="screen">
+                <div class="chat-head">
+                  <div class="av" id="av">L</div>
+                  <div class="who"><b id="chatName">Lia · Studio Ana Luz</b><small id="chatStatus">online agora</small></div>
+                  <button class="reset" type="button" id="resetChat">Recomeçar</button>
+                </div>
+                <div class="msgs" id="msgs" aria-live="polite"></div>
+                <div class="chips" id="chips"></div>
+                <form class="composer" id="composer">
+                  <label for="msgIn" class="sr">Sua mensagem</label>
+                  <input id="msgIn" autocomplete="off" placeholder="Escreva como cliente">
+                  <button type="submit" id="sendBtn">Enviar</button>
+                </form>
+              </div>
+            </div>
+            <div class="dono" aria-live="polite">
+              <div class="owner-head"><b id="ownerTitle">O que a Ana vê na agenda</b><span id="ownerDay"></span></div>
+              <div class="slots" id="slots"></div>
+            </div>
+          </div>
+          <p class="note" id="modeNote" style="margin-top:10px"></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="cap" id="planos" aria-label="Planos">
+      <div class="msg voce"><p class="bolha">Quanto custa?</p></div>
+      <div class="msg lia"><p class="bolha">Três planos, todos com 14 dias grátis para testar:</p></div>
+      <div class="msg lia larga">
+        <div class="planos">
+          <article class="plano">
+            <h3>Essencial</h3><p class="para">Para quem atende sozinho</p>
+            <p class="preco"><b>R$ 79</b><span>/mês</span></p>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>1 profissional</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Lia no WhatsApp</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Agenda online e link de agendamento</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Lembretes automáticos</li>
+            </ul>
+            <a class="btn btn-claro" href="#lista" data-plano="Essencial">Quero o Essencial</a>
+          </article>
+          <article class="plano destaque">
+            <span class="selo">Recomendado</span>
+            <h3>Profissional</h3><p class="para">Para salões e clínicas</p>
+            <p class="preco"><b>R$ 149</b><span>/mês</span></p>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Até 5 profissionais</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Lia no WhatsApp e no Instagram</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Tudo do Essencial</li>
+            </ul>
+            <a class="btn btn-ciano" href="#lista" data-plano="Profissional">Quero o Profissional</a>
+          </article>
+          <article class="plano">
+            <h3>Equipe</h3><p class="para">Para equipes maiores</p>
+            <p class="preco"><b>R$ 249</b><span>/mês</span></p>
+            <ul>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Até 12 profissionais</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Lia no WhatsApp e no Instagram</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Relatórios de agenda e faltas</li>
+              <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Tudo do Profissional</li>
+            </ul>
+            <a class="btn btn-claro" href="#lista" data-plano="Equipe">Quero o Equipe</a>
+          </article>
+        </div>
+      </div>
+      <div class="msg lia"><p class="bolha">Na dúvida, comece pelo Essencial e mude de plano quando a agenda pedir.</p></div>
+    </section>
+
+    <section class="cap" id="lista" aria-label="Entrar na lista">
+      <div class="msg voce"><p class="bolha" id="querUsar">Quero usar!</p></div>
+      <div class="msg lia"><p class="bolha">Que bom! Estamos abrindo aos poucos. Me passa seus dados que eu te chamo no WhatsApp quando chegar a sua vez.</p></div>
+      <div class="msg lia larga">
+        <div class="cartao">
+          <form class="lista" id="lista-form" novalidate>
+            <div id="formFields" style="display:flex;flex-direction:column;gap:12px">
+              <div class="field"><label for="fNome">Seu nome</label><input id="fNome" name="nome" autocomplete="name" required placeholder="Ana Ribeiro"></div>
+              <div class="field"><label for="fNegocio">Nome do negócio</label><input id="fNegocio" name="negocio" required placeholder="Studio Ana Luz"></div>
+              <div class="row2">
+                <div class="field"><label for="fTipo">Tipo de negócio</label>
+                  <select id="fTipo" name="tipo"><option>Salão de beleza</option><option>Clínica de estética</option><option>Manicure e pedicure</option><option>Barbearia</option><option>Sobrancelha e cílios</option><option>Outro</option></select></div>
+                <div class="field"><label for="fPlano">Plano de interesse</label>
+                  <select id="fPlano" name="plano"><option>Ainda não sei</option><option>Essencial</option><option>Profissional</option><option>Equipe</option></select></div>
+              </div>
+              <div class="row2">
+                <div class="field"><label for="fCidade">Cidade</label><input id="fCidade" name="cidade" autocomplete="address-level2" placeholder="Rio de Janeiro"></div>
+                <div class="field"><label for="fZap">WhatsApp com DDD</label><input id="fZap" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" required placeholder="(21) 90000-0000"></div>
+              </div>
+              <button class="btn btn-marinho" type="submit" id="fBtn">Entrar na lista de espera</button>
+              <p class="form-msg" id="fMsg" role="status"></p>
+            </div>
+            <div class="done" id="done" hidden>
+              <b id="doneTitle">Pronto, você está na lista.</b>
+              <p>Vou te chamar no WhatsApp quando abrir a vaga para o seu negócio.</p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="cap" id="duvidas" aria-label="Dúvidas">
+      <div class="msg lia"><p class="bolha">Ficou alguma dúvida? Toque numa pergunta:</p></div>
+      <div id="faqFio" style="display:flex;flex-direction:column;gap:12px" aria-live="polite"></div>
+      <div class="msg lia larga">
+        <div class="respostas" id="faq">
+          <button type="button" class="resp" data-r="Não. A ideia é usar o número que seus clientes já conhecem, pela conexão oficial do WhatsApp Business. Você continua vendo as conversas no celular.">Preciso trocar meu número?</button>
+          <button type="button" class="resp" data-r="Eu aviso o cliente que vou confirmar com você e mando um alerta no seu painel. Você responde ou assume a conversa com um toque.">E se perguntarem algo que você não sabe?</button>
+          <button type="button" class="resp" data-r="Pode. A agenda é sua: você marca, bloqueia horários e muda o que quiser. Eu só ofereço o que está livre.">Posso marcar horários eu mesmo?</button>
+          <button type="button" class="resp" data-r="Você conecta a conta profissional do Instagram do seu negócio. Eu respondo as mensagens do Direct, e os horários entram na mesma agenda do WhatsApp.">Como funciona no Instagram?</button>
+          <button type="button" class="resp" data-r="Sim. Durante os 14 dias você usa tudo do plano escolhido e decide depois se continua.">Os 14 dias grátis valem para todos os planos?</button>
+        </div>
+      </div>
+    </section>
+
+    <footer class="rodape">
+      <span class="logo"><svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true"><path d="M14 8h36a10 10 0 0 1 10 10v22a10 10 0 0 1-10 10H28l-13 10V50a10 10 0 0 1-11-10V18A10 10 0 0 1 14 8z" fill="#14B8C4"/><path d="M22 3v10M42 3v10" stroke="#14B8C4" stroke-width="5" stroke-linecap="round"/><path d="M20 29l8 8 16-16" fill="none" stroke="#0F2340" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg><b style="font-size:19px">marcaí</b></span>
+      <span>Seu cliente pede. A Marcaí marca.</span>
+      <a href="/entrar" style="color:var(--claro-suave)">Entrar no painel</a>
+    </footer>
+  </main>
+
+  <aside class="agenda-lado" aria-label="Agenda de exemplo enchendo">
+    <div class="contador"><b id="cont" class="num">4</b><span id="contRot">horários marcados pela Lia hoje</span></div>
+    <div class="ag" id="agLado">
+      <div class="ag-head"><b>Agenda de hoje</b><span>Studio Ana Luz</span></div>
+      <ul id="agLista">
+        <li><span class="h">09:00</span><span class="n">Cláudia, coloração<small>por você</small></span></li>
+        <li class="lia" data-passo="1"><span class="h">10:30</span><span class="n">Carla, escova<small>pela Lia · WhatsApp</small></span></li>
+        <li class="lia" data-passo="2"><span class="h">14:00</span><span class="n">Bianca, pé e mão<small>pela Lia · WhatsApp</small></span></li>
+        <li class="lia" data-passo="3"><span class="h">15:30</span><span class="n">Renata, limpeza de pele<small>pela Lia · Instagram</small></span></li>
+        <li><span class="h">16:30</span><span class="n">Juliana, escova<small>por você</small></span></li>
+        <li class="lia" data-passo="4"><span class="h">17:30</span><span class="n">Patrícia, corte<small>pela Lia · Instagram</small></span></li>
+      </ul>
+    </div>
+    <p style="font-size:13.5px;color:var(--claro-suave)">Role a conversa e veja a agenda enchendo.</p>
+  </aside>
+</div>
+
+<button type="button" class="pilula" id="pilula" aria-expanded="false" aria-controls="folha"><span class="n" id="contPil">4</span>marcados pela Lia</button>
+<div class="folha" id="folha" hidden></div>
+
+<script>
+(() => {
+const WD = ["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
+const pad = n => String(n).padStart(2,"0");
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const toMin = s => { const [h,m] = String(s).split(":").map(Number); return h*60+(m||0); };
+const toHM = m => `${pad(Math.floor(m/60))}:${pad(m%60)}`;
+const money = v => "R$ " + v;
+const today = new Date(); today.setHours(0,0,0,0);
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const fmtDate = s => { const d = new Date(s+"T00:00:00"); const diff = Math.round((d-today)/864e5); return diff===0?"hoje":diff===1?"amanhã":`${WD[d.getDay()]}, ${pad(d.getDate())}/${pad(d.getMonth()+1)}`; };
+const $ = id => document.getElementById(id);
+
+const BIZ = {
+  barbearia: { key:"barbearia", name:"Barbearia do Zé", owner:"Zé", ownerArt:"o Zé", agent:"Lia", addr:"Rua Conde de Bonfim, 210, Tijuca, Rio",
+    open:"09:00", close:"20:00", lunch:"12:00", lunchEnd:"13:00", days:[2,3,4,5,6],
+    notes:"Tolerância de 10 minutos. Pagamento em Pix, débito ou crédito.",
+    tone:"descontraído e direto, como um bom atendente de barbearia de bairro; pode usar 'fala', 'fechou', sem exagerar nas gírias",
+    services:[{name:"Corte",min:40,price:45},{name:"Barba",min:30,price:35},{name:"Corte e barba",min:60,price:70},{name:"Pezinho",min:15,price:15},{name:"Sobrancelha",min:15,price:20}],
+    seed:[["Rodrigo","Corte","10:00"],["Caio","Barba","14:30"],["Felipe","Corte e barba","16:00"],["Marcos","Corte","18:00"]],
+    hello:"Fala! Aqui é a Lia, da Barbearia do Zé. Quer marcar um horário?",
+    chips:["Tem horário hoje à noite?","Quanto é corte e barba?","Quero marcar pra sábado"] },
+  salao: { key:"salao", name:"Studio Ana Luz", owner:"Ana", ownerArt:"a Ana", agent:"Lia", addr:"Rua Voluntários da Pátria, 120, Botafogo, Rio",
+    open:"09:00", close:"19:00", lunch:"12:00", lunchEnd:"13:00", days:[2,3,4,5,6],
+    notes:"Tolerância de 15 minutos. Coloração precisa de teste de mecha 48 horas antes, sem custo.",
+    tone:"acolhedor e próximo, como uma recepcionista querida pelas clientes",
+    services:[{name:"Corte feminino",min:60,price:80},{name:"Escova",min:45,price:50},{name:"Manicure",min:40,price:35},{name:"Pé e mão",min:80,price:60},{name:"Coloração",min:120,price:180}],
+    seed:[["Cláudia","Coloração","09:00"],["Bianca","Pé e mão","14:00"],["Juliana","Escova","16:30"]],
+    hello:"Oi! Aqui é a Lia, do Studio Ana Luz. Como posso te ajudar?",
+    chips:["Tem horário pra escova amanhã?","Quanto custa a manicure?","Quero marcar um corte"] },
+  estetica: { key:"estetica", name:"Clínica Pele Viva", owner:"Renata", ownerArt:"a Renata", agent:"Lia", addr:"Rua Barão de Mesquita, 450, Tijuca, Rio",
+    open:"09:00", close:"19:00", lunch:"12:00", lunchEnd:"13:00", days:[1,2,3,4,5,6],
+    notes:"Chegue 10 minutos antes para a ficha de avaliação. Limpeza de pele não é indicada com a pele em processo de descascar.",
+    tone:"calmo, cuidadoso e profissional, como a recepção de uma clínica de estética acolhedora",
+    services:[{name:"Limpeza de pele",min:90,price:150},{name:"Design de sobrancelha",min:30,price:45},{name:"Drenagem linfática",min:60,price:120},{name:"Peeling",min:45,price:180},{name:"Massagem relaxante",min:60,price:130}],
+    seed:[["Renata","Limpeza de pele","10:00"],["Patrícia","Drenagem linfática","14:00"],["Lívia","Design de sobrancelha","16:30"]],
+    hello:"Olá! Aqui é a Lia, da Clínica Pele Viva. Em que posso te ajudar?",
+    chips:["Quanto custa a limpeza de pele?","Tem horário pra sobrancelha hoje?","Quero marcar uma drenagem"] }
+};
+let biz = BIZ.salao;
+const store = {};
+function nextOpen(from){ let d=new Date(from); for(let i=0;i<8;i++){ if(biz.days.includes(d.getDay())) return d; d=addDays(d,1);} return from; }
+function bookings(){
+  if(!store[biz.key]){
+    const d = nextOpen(today);
+    store[biz.key] = biz.seed.map(([n,s,h],i)=>({id:"s"+i,name:n,service:s,date:iso(d),time:h,src:"dono"}));
+  }
+  return store[biz.key];
+}
+const svcBy = n => { const q=String(n||"").toLowerCase().trim(); return biz.services.find(s=>s.name.toLowerCase()===q) || (q.length>2 && biz.services.find(s=>s.name.toLowerCase().includes(q) || q.includes(s.name.toLowerCase()))); };
+
+function freeSlots(dateStr, serviceName){
+  const d = new Date(String(dateStr)+"T00:00:00");
+  if (isNaN(d)) return {erro:"Data inválida. Use AAAA-MM-DD."};
+  if (d < today) return {erro:"Essa data já passou."};
+  if (!biz.days.includes(d.getDay())) return {fechado:true, dia:WD[d.getDay()], horarios:[]};
+  const svc = svcBy(serviceName); const dur = svc ? svc.min : 30;
+  const o=toMin(biz.open), c=toMin(biz.close), l1=toMin(biz.lunch), l2=toMin(biz.lunchEnd);
+  const taken = bookings().filter(b=>b.date===iso(d)).map(b=>{ const s=svcBy(b.service); const st=toMin(b.time); return [st, st+(s?s.min:30)]; });
+  const now = new Date(); const lim = iso(d)===iso(today) ? now.getHours()*60+now.getMinutes()+30 : 0;
+  const out=[];
+  for(let t=o; t+dur<=c; t+=30){ const e=t+dur; if(t<lim) continue; if(t<l2 && e>l1) continue; if(taken.some(([a,b])=>t<b && e>a)) continue; out.push(toHM(t)); }
+  return {dia:WD[d.getDay()], servico: svc?svc.name:null, duracao_min:dur, horarios:out};
+}
+function book({nome, servico, data, hora}){
+  const svc = svcBy(servico);
+  if(!svc) throw new Error(`Serviço "${servico}" não existe. Serviços: ${biz.services.map(s=>s.name).join(", ")}`);
+  if(!nome || String(nome).trim().length<2) throw new Error("Falta o nome do cliente.");
+  const fs = freeSlots(data, svc.name);
+  if(fs.erro) throw new Error(fs.erro);
+  if(fs.fechado) throw new Error(`Fechado na ${fs.dia}.`);
+  const h = toHM(toMin(String(hora)));
+  if(!fs.horarios.includes(h)) throw new Error(`O horário ${h} não está livre. Livres: ${fs.horarios.slice(0,8).join(", ")||"nenhum"}`);
+  const b = {id:"n"+Date.now(), name:String(nome).trim(), service:svc.name, date:String(data), time:h, src:"lia"};
+  bookings().push(b); viewDate=b.date; lastNew=b.id; renderOwner();
+  sysMsg(`Marcado na agenda: ${b.name}, ${svc.name}, ${fmtDate(b.date)} às ${h}`);
+  return {ok:true, servico:svc.name, data:b.date, dia:fmtDate(b.date), hora:h, preco:svc.price};
+}
+function cancel({nome, data}){
+  const n=String(nome||"").toLowerCase(); if(n.length<2) throw new Error("Preciso do nome do cliente.");
+  const list=bookings(); const i=list.findIndex(b=>b.name.toLowerCase().includes(n) && (!data||b.date===data) && b.src==="lia");
+  if(i<0) throw new Error("Não encontrei agendamento com esse nome.");
+  const [b]=list.splice(i,1); renderOwner(); sysMsg(`Cancelado: ${b.name}, ${fmtDate(b.date)} às ${b.time}`);
+  return {ok:true, cancelado:{servico:b.service, data:b.date, hora:b.time}};
+}
+
+/* agenda do dono */
+let viewDate = iso(nextOpen(today)), lastNew = null;
+function renderOwner(){
+  $("ownerTitle").textContent = `O que ${biz.ownerArt} vê na agenda`;
+  $("ownerDay").textContent = fmtDate(viewDate).replace(/^./,c=>c.toUpperCase());
+  const box=$("slots"); box.textContent="";
+  const list=bookings().filter(b=>b.date===viewDate).sort((a,b)=>toMin(a.time)-toMin(b.time));
+  if(!list.length){ const p=document.createElement("p"); p.className="note"; p.textContent="Nenhum horário marcado neste dia ainda."; box.append(p); }
+  for(const b of list){
+    const s=svcBy(b.service)||{price:0};
+    const row=document.createElement("div"); row.className="slot"+(b.id===lastNew?" new":"");
+    const h=document.createElement("span"); h.className="h "+(b.src==="lia"?"ia":"dono"); h.textContent=b.time;
+    const n=document.createElement("span"); n.className="n"; n.textContent=`${b.name}, ${b.service.toLowerCase()}`+(b.src==="lia"?" (pela Lia)":"");
+    const p=document.createElement("span"); p.className="p"; p.textContent=money(s.price);
+    row.append(h,n,p); box.append(row);
+    if(b.id===lastNew) requestAnimationFrame(()=>row.scrollIntoView({block:"nearest"}));
+  }
+}
+
+/* conversa */
+let turns=[], busy=false, sample=null, mode="loading", ctl=null, demo={};
+const msgs=$("msgs");
+function bubble(text, who){ const b=document.createElement("div"); b.className="b "+who; b.textContent=text; msgs.append(b); msgs.scrollTop=msgs.scrollHeight; return b; }
+const sysMsg = t => bubble(t,"sys");
+function typing(on){ let t=msgs.querySelector(".typing"); if(on&&!t){ t=document.createElement("div"); t.className="typing"; t.innerHTML="<i></i><i></i><i></i>"; msgs.append(t); msgs.scrollTop=msgs.scrollHeight;} if(!on&&t) t.remove(); $("chatStatus").textContent=on?"digitando…":"online agora"; }
+function setChips(list){ const c=$("chips"); c.textContent=""; list.forEach(x=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=x; b.onclick=()=>send(x); c.append(b); }); }
+const clean = t => t.replace(/\*\*(.+?)\*\*/g,"$1").replace(/^#+\s*/gm,"").trim();
+
+function calendar(){ const L=[]; for(let i=0;i<14;i++){ const d=addDays(today,i); L.push(`${iso(d)} = ${WD[d.getDay()]}${i===0?" (hoje)":i===1?" (amanhã)":""}${biz.days.includes(d.getDay())?"":" — FECHADO"}`);} return L.join("\n"); }
+function rules(){
+  const now=new Date();
+  return `Você é ${biz.agent}, atendente do ${biz.name}, conversando com um cliente pelo WhatsApp, em português do Brasil.
+
+JEITO DE FALAR: ${biz.tone}. Mensagens curtas (1 a 3 frases), sem listas, sem markdown, no máximo um emoji de vez em quando. Use o nome do cliente quando souber. Se perguntarem se você é robô ou IA, diga com honestidade que é a atendente virtual do ${biz.name} e que ${biz.owner} também acompanha as conversas.
+
+DADOS DO NEGÓCIO (use só isto, nunca invente):
+Endereço: ${biz.addr}
+Atendimento: ${biz.days.map(d=>WD[d]).join(", ")}, das ${biz.open} às ${biz.close}, almoço ${biz.lunch} às ${biz.lunchEnd}.
+Serviços:
+${biz.services.map(s=>`- ${s.name}: ${s.min} min, R$ ${s.price}`).join("\n")}
+Avisos: ${biz.notes}
+
+CALENDÁRIO (agora são ${pad(now.getHours())}:${pad(now.getMinutes())}):
+${calendar()}
+
+COMO AGENDAR:
+1. Descubra o serviço e o dia. Sempre chame ver_horarios antes de sugerir horários e ofereça 2 ou 3 opções.
+2. Peça o nome do cliente.
+3. Confirme em uma frase serviço, dia, hora e preço. Só chame agendar depois que o cliente concordar.
+4. Depois de marcar, confirme e lembre um aviso útil.
+Para remarcar, cancele com cancelar_agendamento e marque de novo. Se perguntarem algo que você não sabe, diga que vai confirmar com ${biz.owner} e responder em seguida. Se a conversa fugir do assunto, responda com simpatia em uma frase e volte ao atendimento.`;
+}
+const TOOLS=[
+  {name:"ver_horarios",description:"Lista horários livres de início para um serviço numa data. Retorna {dia, horarios} ou {fechado:true}.",inputSchema:{type:"object",properties:{data:{type:"string",description:"AAAA-MM-DD"},servico:{type:"string"}},required:["data","servico"]},execute:i=>freeSlots(String(i.data),String(i.servico))},
+  {name:"agendar",description:"Marca o horário na agenda. Use só depois da confirmação do cliente.",inputSchema:{type:"object",properties:{nome:{type:"string"},servico:{type:"string"},data:{type:"string",description:"AAAA-MM-DD"},hora:{type:"string",description:"HH:MM"}},required:["nome","servico","data","hora"]},execute:i=>book(i)},
+  {name:"cancelar_agendamento",description:"Cancela um agendamento pelo nome do cliente e, se souber, a data.",inputSchema:{type:"object",properties:{nome:{type:"string"},data:{type:"string"}},required:["nome"]},execute:i=>cancel(i)}
+];
+
+async function send(text){
+  text=String(text).trim(); if(!text||busy) return;
+  $("msgIn").value=""; setChips([]); bubble(text,"in");
+  busy=true; $("sendBtn").disabled=true;
+  await new Promise(r=>setTimeout(r,300)); typing(true);
+  try{ if(mode==="ai") await aiReply(text); else await demoReply(text); }
+  finally{ busy=false; $("sendBtn").disabled=false; typing(false); }
+}
+async function aiReply(text){
+  turns.push({role:"user",content:text}); if(turns.length>24) turns=turns.slice(-24); while(turns.length&&turns[0].role!=="user") turns.shift();
+  ctl=new AbortController(); let b=null;
+  try{
+    const res=await sample([{role:"user",content:rules()},...turns],{modelTier:"quick",signal:ctl.signal,tools:TOOLS,
+      onText:({text})=>{ const parts=clean(text).split(/\n\s*\n/); const last=parts[parts.length-1]; if(!last) return; if(!b){typing(false); b=bubble(last,"out");} else b.textContent=last; msgs.scrollTop=msgs.scrollHeight; }});
+    const parts=clean(res.text).split(/\n\s*\n/).filter(Boolean); const fin=parts[parts.length-1]||clean(res.text);
+    if(b) b.textContent=fin; else bubble(fin,"out");
+    turns.push({role:"assistant",content:fin});
+  }catch(e){
+    turns.pop();
+    if(e.code==="cancelled") return;
+    if(["not_granted","sampling_disabled","not_declared","capability_disabled","capability_removed","tools_unavailable"].includes(e.code)){ toDemo(); await demoReply(text); return; }
+    bubble(e.code==="rate_limited"?"Muitas mensagens seguidas. Espere um pouco e tente de novo.":"A mensagem não chegou. Tente enviar de novo.","err");
+  }
+}
+function parseDay(t){
+  if(/\bhoje\b/.test(t)) return iso(today); if(/amanh/.test(t)) return iso(addDays(today,1));
+  for(let i=0;i<7;i++){ const d=addDays(today,i); const n=WD[d.getDay()]; const plain=n.normalize("NFD").replace(/[̀-ͯ]/g,""); if(t.includes(n)||t.includes(plain)) return iso(d); }
+  const m=t.match(/(\d{1,2})\/(\d{1,2})/); if(m) return iso(new Date(today.getFullYear(),Number(m[2])-1,Number(m[1])));
+  return null;
+}
+async function demoReply(text){
+  await new Promise(r=>setTimeout(r,650+Math.random()*450)); typing(false);
+  const t=text.toLowerCase(); const first=n=>n.split(" ")[0];
+  const svc=[...biz.services].sort((a,b)=>b.name.length-a.name.length).find(s=>t.includes(s.name.toLowerCase()));
+  if(svc) demo.svc=svc.name;
+  const day=parseDay(t); if(day) demo.day=day;
+  const hm=t.match(/\b(\d{1,2})(?::|h)(\d{2})?\b/);
+  if(demo.step==="name"){ demo.name=text.trim().replace(/^(é|meu nome é|sou o|sou a)\s+/i,""); demo.step="confirm"; const s=svcBy(demo.svc);
+    bubble(`Prazer, ${first(demo.name)}! Então fica ${demo.svc.toLowerCase()} ${fmtDate(demo.day)} às ${demo.time}, R$ ${s.price}. Posso marcar?`,"out"); setChips(["Pode marcar","Quero outro horário"]); return; }
+  if(demo.step==="confirm"){
+    if(/sim|pode|isso|fechou|confirm|bora|ok/.test(t)){ try{ book({nome:demo.name,servico:demo.svc,data:demo.day,hora:demo.time}); bubble(`Marcado, ${first(demo.name)}! Te espero ${fmtDate(demo.day)} às ${demo.time}. ${biz.notes.split(".")[0]}.`,"out"); demo={}; setChips(["Qual o endereço?","Quero marcar outro"]); }
+      catch(e){ bubble("Esse horário acabou de ser ocupado. Vamos ver outro?","out"); demo.step=null; demo.time=null; } return; }
+    demo.step=null; demo.time=null;
+  }
+  if(/endere|onde fica|localiza/.test(t)){ bubble(`Fica na ${biz.addr}. Quer marcar um horário?`,"out"); return; }
+  if(/rob[oô]|\bia\b|intelig/.test(t)){ bubble(`Sou a atendente virtual do ${biz.name}. ${biz.ownerArt.replace(/^./,c=>c.toUpperCase())} acompanha tudo por aqui também. Quer marcar um horário?`,"out"); return; }
+  if(/pre[cç]o|quanto|valor/.test(t) && !svc){ bubble(biz.services.map(s=>`${s.name} R$ ${s.price}`).join(", ")+". Qual você quer?","out"); setChips(biz.services.slice(0,3).map(s=>s.name)); return; }
+  if(!demo.svc){ bubble("Qual serviço você quer fazer?","out"); setChips(biz.services.slice(0,4).map(s=>s.name)); return; }
+  if(!demo.day){ const s=svcBy(demo.svc); bubble(`${s.name} sai R$ ${s.price} e leva uns ${s.min} minutos. Que dia fica bom?`,"out"); setChips(["Hoje","Amanhã","Sábado"]); return; }
+  const fs=freeSlots(demo.day,demo.svc);
+  if(fs.erro){ bubble("Essa data já passou. Que tal outro dia?","out"); demo.day=null; return; }
+  if(fs.fechado){ bubble(`Na ${fs.dia} a gente não abre. Pode ser outro dia?`,"out"); demo.day=null; setChips(["Amanhã","Sexta","Sábado"]); return; }
+  if(hm){ const h=toHM(Number(hm[1])*60+Number(hm[2]||0)); if(fs.horarios.includes(h)){ demo.time=h; demo.step="name"; bubble(`${h} está livre! Pra quem eu marco?`,"out"); return; } }
+  if(!fs.horarios.length){ bubble(`${fmtDate(demo.day).replace(/^./,c=>c.toUpperCase())} está lotado. Quer tentar outro dia?`,"out"); demo.day=null; setChips(["Amanhã","Sábado"]); return; }
+  const H=fs.horarios; const opts=[H[0],H[Math.floor(H.length/2)],H[H.length-1]].filter((v,i,a)=>a.indexOf(v)===i);
+  bubble(`Para ${fmtDate(demo.day)} tenho ${opts.join(", ")}. Qual prefere?`,"out"); setChips(opts);
+}
+function toDemo(){ mode="demo"; $("modeNote").textContent="Nesta demonstração a conversa segue um roteiro. Peça um horário, escolha uma opção e informe seu nome para ver a agenda atualizar."; }
+
+function startChat(){
+  ctl?.abort(); msgs.textContent=""; turns=[]; demo={};
+  bubble(biz.hello,"out");
+  turns.push({role:"user",content:"(o cliente abriu a conversa)"},{role:"assistant",content:biz.hello});
+  setChips(biz.chips);
+  $("chatName").textContent=`${biz.agent} · ${biz.name}`;
+  viewDate=iso(nextOpen(today)); renderOwner();
+}
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  biz=BIZ[b.dataset.biz]; startChat();
+}));
+$("composer").addEventListener("submit",e=>{e.preventDefault(); send($("msgIn").value);});
+$("resetChat").onclick=()=>{ delete store[biz.key]; startChat(); };
+
+/* aparência */
+const PRESETS=[["Marinho e ciano","#0F2340","#14B8C4"],["Grafite e âmbar","#23272F","#FFB547"],["Verde e areia","#1E4D3A","#E9C46A"],["Vinho e rosé","#5B1A32","#F2A7B8"],["Petróleo e mostarda","#0F4C5C","#F2B33D"],["Azul e tangerina","#13203A","#FF7A3D"]];
+const rgb=h=>{const n=parseInt(h.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255];};
+const lum=h=>{const c=rgb(h).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*c[0]+.7152*c[1]+.0722*c[2];};
+const on=h=>lum(h)>.4?"#0F2340":"#FFFFFF";
+const mix=(a,b,t)=>{const x=rgb(a),y=rgb(b);return"#"+x.map((v,i)=>Math.round(v+(y[i]-v)*t).toString(16).padStart(2,"0")).join("");};
+function applyPreset(p,a){ const r=document.documentElement.style; r.setProperty("--demo-p",p); r.setProperty("--demo-a",a); r.setProperty("--demo-on-p",on(p)); r.setProperty("--demo-on-a",on(a)); r.setProperty("--demo-soft",mix(a,"#FFFFFF",.7)); }
+/* lista de espera */
+const form=$("lista-form");
+form.addEventListener("submit", async e=>{
+  e.preventDefault();
+  const msg=$("fMsg"); msg.className="form-msg";
+  const data={ nome:$("fNome").value.trim(), negocio:$("fNegocio").value.trim(), tipo:$("fTipo").value, cidade:$("fCidade").value.trim(), whatsapp:$("fZap").value.trim(), plano:$("fPlano").value };
+  if(!data.nome||!data.negocio){ msg.className="form-msg err"; msg.textContent="Preencha seu nome e o nome do negócio."; return; }
+  if(data.whatsapp.replace(/\D/g,"").length<10){ msg.className="form-msg err"; msg.textContent="Digite o WhatsApp com DDD, por exemplo (21) 90000-0000."; ($("fZap")).focus(); return; }
+  $("fBtn").disabled=true; msg.textContent="Enviando…";
+  try{
+    const r = await fetch("/api/lista-espera",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+    if(!r.ok){ const j=await r.json().catch(()=>({})); if(j.erro){ msg.className="form-msg err"; msg.textContent=j.erro; $("fBtn").disabled=false; return; } throw new Error("falhou"); }
+    $("formFields").hidden=true; $("done").hidden=false; $("doneTitle").textContent=`Pronto, ${data.nome.split(" ")[0]}! Você está na lista.`;
+  }
+  catch(err){ msg.className="form-msg err"; msg.textContent="Não foi possível salvar agora. Confira sua conexão e tente de novo."; $("fBtn").disabled=false; }
+});
+
+startChat();
+toDemo();
+
+})();
+</script>
+<style>
+.ag li.livre .h{background:transparent;outline:1px dashed #B9C6D6;outline-offset:-1px;color:var(--suave)}
+.ag li.livre .n{color:var(--suave)}
+</style>
+<script>
+(() => {
+const reduz = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $ = id => document.getElementById(id);
+const espera = ms => new Promise(r=>setTimeout(r,ms));
+
+/* 1. capítulos: marca onde a pessoa está na conversa */
+const links = [...document.querySelectorAll("#capitulos a")];
+const caps = links.map(a => document.querySelector(a.getAttribute("href")));
+function marcarCapitulo(){
+  const meio = window.innerHeight * 0.4; let atual = 0;
+  caps.forEach((c,i) => { if(c && c.getBoundingClientRect().top < meio) atual = i; });
+  links.forEach((a,i) => { a.classList.toggle("atual", i===atual); a.classList.toggle("lido", i<atual); if(i===atual) a.setAttribute("aria-current","step"); else a.removeAttribute("aria-current"); });
+}
+
+/* 2. a agenda do lado enche conforme a conversa avança */
+const agItens = [...document.querySelectorAll("#agLista li[data-passo]")];
+const guardado = new Map();
+agItens.forEach(li => { guardado.set(li, li.querySelector(".n").innerHTML); li.classList.add("livre"); li.classList.remove("lia"); li.querySelector(".n").textContent = "Livre"; });
+let marcados = 0;
+function atualizarContador(){ $("cont").textContent = marcados; $("contPil").textContent = marcados; $("contRot").textContent = marcados === 1 ? "horário marcado pela Lia hoje" : "horários marcados pela Lia hoje"; }
+atualizarContador();
+function encher(ate){
+  agItens.forEach(li => {
+    if(Number(li.dataset.passo) <= ate && li.classList.contains("livre")){
+      li.classList.remove("livre"); li.classList.add("lia");
+      li.querySelector(".n").innerHTML = guardado.get(li);
+      if(!reduz){ li.classList.remove("novo"); void li.offsetWidth; li.classList.add("novo"); }
+      marcados++;
+    }
+  });
+  atualizarContador();
+}
+const marcas = [...document.querySelectorAll("[data-marca]")];
+function checarMarcas(){
+  const lim = window.innerHeight * 0.6; let ate = 0;
+  marcas.forEach(s => { if(s.getBoundingClientRect().top < lim) ate = Math.max(ate, Number(s.dataset.marca)); });
+  if(ate) encher(ate);
+}
+
+let pedido = false;
+window.addEventListener("scroll", () => { if(pedido) return; pedido = true; requestAnimationFrame(() => { marcarCapitulo(); checarMarcas(); pedido = false; }); }, {passive:true});
+marcarCapitulo(); checarMarcas();
+
+/* 3. pílula do celular abre a agenda */
+const pilula = $("pilula"), folha = $("folha");
+function fecharFolha(){ folha.hidden = true; folha.textContent = ""; pilula.setAttribute("aria-expanded","false"); pilula.focus(); }
+pilula.addEventListener("click", () => {
+  if(!folha.hidden){ fecharFolha(); return; }
+  const copia = $("agLado").cloneNode(true); copia.removeAttribute("id"); copia.querySelector("ul").removeAttribute("id");
+  const fechar = document.createElement("button"); fechar.type = "button"; fechar.className = "btn btn-ciano fechar"; fechar.textContent = "Voltar à conversa";
+  fechar.onclick = fecharFolha;
+  folha.append(copia, fechar); folha.hidden = false; pilula.setAttribute("aria-expanded","true"); fechar.focus();
+});
+document.addEventListener("keydown", e => { if(e.key === "Escape" && !folha.hidden) fecharFolha(); });
+
+/* 4. mensagens chegam ao rolar: só deslocam, nunca ficam escondidas */
+if(!reduz && "IntersectionObserver" in window){
+  const vh = window.innerHeight || 800;
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if(!e.isIntersecting) return;
+    const el = e.target; io.unobserve(el);
+    el.classList.add("anima"); requestAnimationFrame(() => el.classList.remove("chega"));
+  }), {threshold:.2});
+  document.querySelectorAll(".cap .msg").forEach(el => {
+    if(el.getBoundingClientRect().top > vh * 0.95){
+      const irmaos = [...el.parentElement.querySelectorAll(":scope > .msg")];
+      el.style.transitionDelay = (Math.max(0, irmaos.indexOf(el)) * 140) + "ms";
+      el.classList.add("chega"); io.observe(el);
+    }
+  });
+}
+
+/* 5. fila de mensagens chegando no topo */
+const fila = $("fila");
+const POOL = [
+  ["zap","WhatsApp · Fernanda","oi, faz pé e mão amanhã?","Marcado amanhã 10:00"],
+  ["insta","Instagram · @gabi.costa","quanto tá o design de sobrancelha?","Marcado sex 16:00"],
+  ["zap","WhatsApp · Rafael","dá pra cortar no sábado cedo?","Marcado sáb 09:30"],
+  ["insta","Instagram · @luana.m","vi o story, ainda tem vaga quinta?","Marcado qui 17:30"],
+  ["zap","WhatsApp · Carla","tem horário pra escova sábado?","Marcado sáb 09:00"],
+  ["insta","Instagram · @renata.lima","vi o post da limpeza de pele, quanto tá?","Marcado ter 15:30"],
+  ["zap","WhatsApp · Lucas","consegue me encaixar hoje depois das 18h?","Marcado hoje 18:30"]
+];
+const ICO = {
+  zap:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.4-4.2A8 8 0 1 1 8.2 18.6z"/></svg>',
+  insta:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/></svg>'
+};
+if(fila && !reduz){
+  let idx = 0, filaVisivel = true, girando = false;
+  new IntersectionObserver(es => { filaVisivel = es[0].isIntersecting; if(filaVisivel) girar(); }).observe(fila);
+  async function girar(){
+    if(girando) return; girando = true;
+    while(filaVisivel){
+      await espera(2600);
+      const [canal, quem, txt, st] = POOL[idx % POOL.length]; idx++;
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="ico">${ICO[canal]}</span><span class="txt"><small></small><span></span></span><span class="st">Lia digitando…</span>`;
+      li.querySelector("small").textContent = quem; li.querySelector(".txt span").textContent = txt;
+      li.style.opacity = "0"; li.style.transform = "translateY(10px)";
+      const velho = fila.firstElementChild; velho.classList.add("sai");
+      await espera(450); velho.remove();
+      fila.append(li); requestAnimationFrame(() => { li.style.opacity = ""; li.style.transform = ""; });
+      await espera(1500);
+      li.classList.add("ok"); li.querySelector(".st").textContent = st;
+    }
+    girando = false;
+  }
+}
+
+/* 6. troca de canal: WhatsApp e Instagram */
+const CANAIS = {
+  whats:{nome:"Studio Ana Luz", canal:"WhatsApp Business · online", c:"oi! tem horário pra escova no sábado?", l:"Oi, Carla! Sábado tenho 09:00 ou 10:30. A escova sai R$ 50. Qual prefere?"},
+  insta:{nome:"studioanaluz", canal:"Instagram Direct · ativo agora", c:"vi o post da escova, tem horário sábado?", l:"Oi, Carla! Tenho sim: 09:00 ou 10:30 no sábado. A escova sai R$ 50. Qual prefere?"}
+};
+const botoesCanal = [...document.querySelectorAll("[data-canal]")];
+function mostrarCanal(k){
+  const d = CANAIS[k];
+  botoesCanal.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.canal === k)));
+  $("mini").classList.toggle("insta", k === "insta");
+  $("miniNome").textContent = d.nome; $("miniCanal").textContent = d.canal; $("miniC").textContent = d.c; $("miniL").textContent = d.l;
+}
+let autoCanal = !reduz;
+botoesCanal.forEach(b => b.addEventListener("click", () => { autoCanal = false; mostrarCanal(b.dataset.canal); }));
+if(autoCanal){
+  let atual = "whats";
+  setInterval(() => {
+    if(!autoCanal) return;
+    const r = $("mini").getBoundingClientRect(); if(r.bottom < 0 || r.top > innerHeight) return;
+    atual = atual === "whats" ? "insta" : "whats"; mostrarCanal(atual);
+  }, 4200);
+}
+
+/* 7. tom de voz por tipo de negócio */
+const TONS = {
+  salao:["oi! a Ana tem horário pra mim essa semana?","Oi, Patrícia! Que bom te ver de novo. Quinta às 17:30 está livre com a Ana. Vai ser o corte de sempre?"],
+  clinica:["quanto tempo dura a limpeza de pele?","Uma hora e meia, Marina. Sai R$ 150. Quer que eu veja um horário essa semana?"],
+  barbearia:["fala, consegue me encaixar hj?","Fala, Lucas! Hoje tenho 18:00 com o Zé. Corte e barba, R$ 70. Fechou?"]
+};
+const botoesTom = [...document.querySelectorAll("[data-tom]")];
+botoesTom.forEach(b => b.addEventListener("click", () => {
+  botoesTom.forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  const [c,l] = TONS[b.dataset.tom]; const box = $("exemplo");
+  box.querySelector(".c").textContent = c; box.querySelector(".l").textContent = l;
+  if(!reduz) box.animate([{transform:"translateY(8px)",opacity:.4},{transform:"none",opacity:1}],{duration:320,easing:"ease-out"});
+}));
+
+/* 8. assumir conversa (demonstração) */
+document.querySelectorAll(".alerta .btn").forEach(b => b.addEventListener("click", () => { b.textContent = "Conversa com você agora"; b.disabled = true; }));
+
+/* 9. escolher um plano leva para a lista já preenchida */
+document.querySelectorAll("[data-plano]").forEach(a => a.addEventListener("click", () => {
+  const p = a.dataset.plano; $("fPlano").value = p; $("querUsar").textContent = `Quero o ${p}!`;
+}));
+
+/* 10. dúvidas viram conversa */
+const fio = $("faqFio");
+document.querySelectorAll("#faq .resp").forEach(b => b.addEventListener("click", async () => {
+  b.hidden = true;
+  const voce = document.createElement("div"); voce.className = "msg voce"; const pv = document.createElement("p"); pv.className = "bolha"; pv.textContent = b.textContent; voce.append(pv); fio.append(voce);
+  const dig = document.createElement("div"); dig.className = "digitando"; dig.setAttribute("aria-label","Lia digitando"); dig.innerHTML = "<i></i><i></i><i></i>";
+  if(!reduz){ fio.append(dig); await espera(900); dig.remove(); }
+  const lia = document.createElement("div"); lia.className = "msg lia"; const pl = document.createElement("p"); pl.className = "bolha"; pl.textContent = b.dataset.r; lia.append(pl); fio.append(lia);
+  if(![...document.querySelectorAll("#faq .resp")].some(x => !x.hidden)){
+    const fim = document.createElement("div"); fim.className = "msg lia"; const pf = document.createElement("p"); pf.className = "bolha"; pf.textContent = "Ficou outra dúvida? Deixe seus dados na lista acima e eu respondo no seu WhatsApp."; fim.append(pf); fio.append(fim);
+  }
+}));
+})();
+</script>
+
+</body>
+</html>

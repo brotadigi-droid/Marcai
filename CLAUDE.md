@@ -1,6 +1,6 @@
 # Marcaí
 
-Atendente virtual com agenda online para pequenos negócios de serviço: salões de beleza, manicures, clínicas de estética, barbearias, estúdios de sobrancelha e cílios. A atendente (nome padrão "Lia") conversa com os clientes pelo WhatsApp, oferece horários livres e marca sozinha, enquanto o dono atende.
+Atendente virtual com agenda online para pequenos negócios de serviço: salões de beleza, manicures, clínicas de estética, barbearias, estúdios de sobrancelha e cílios. A atendente (nome padrão "Lia") conversa com os clientes pelo WhatsApp e pelo Instagram Direct, oferece horários livres e marca sozinha, enquanto o dono atende.
 
 Slogan: "Seu cliente pede. A Marcaí marca."
 
@@ -15,12 +15,15 @@ Slogan: "Seu cliente pede. A Marcaí marca."
 - **Supabase**: Postgres, autenticação do dono (e-mail com link mágico) e Row Level Security.
 - **Claude API** (SDK `@anthropic-ai/sdk`) para a atendente, com tool use. Modelo padrão `claude-haiku-5-5`; usar `claude-sonnet-5-5` só se a qualidade pedir.
 - **WhatsApp Business Platform (Cloud API)** da Meta: webhook para receber mensagens, Graph API para enviar.
+- **Instagram Direct** pela API de mensagens do Instagram da Meta, no mesmo webhook (etapa 5b do plano).
 - Testes com **Vitest**. Lint com ESLint e formatação com Prettier.
 
 ## Estrutura de pastas
 
 ```
+public/lancamento.html                                  -> site de lançamento, servido em / (rewrite no next.config.ts)
 app/
+  api/lista-espera/route.ts                             -> inscrição da lista de espera (função entrar_lista_espera)
   (painel)/hoje, agenda, conversas, clientes, ajustes   -> painel do dono (autenticado)
   [slug]/                                               -> página pública de agendamento
   api/whatsapp/webhook/route.ts                         -> recebe e verifica mensagens da Meta
@@ -76,9 +79,10 @@ Detalhes em `docs/agente.md`. O essencial:
 
 Detalhes em `docs/marca.md`. Resumo:
 
-- Cores: amarelo `#FFD23F` (destaque, botão principal), verde-petróleo `#0F3D3E` (estrutura, menu, mensagens da atendente), menta `#DDEFE8`, pêssego `#FFE3D3`, fundo `#F1F4F2`, superfície `#FFFFFF`.
-- Gradiente Sol `linear-gradient(135deg, #FFE27A 0%, #FFD23F 42%, #FFB38A 100%)`, só em áreas grandes.
-- Fonte da interface: **Onest**. Fonte de campanha (só site e redes): **Big Shoulders Display**.
+- Direção corporativa e moderna, unissex. Cores: marinho `#0F2340` (estrutura, menu, mensagens da atendente), ciano `#14B8C4` (ação, botão principal), ciano-texto `#0B7F8A` (links sobre claro), ciano-gelo `#DFF6F7` (o que a atendente marcou), âmbar `#FFB547` (selo "Marcado", um por tela), fundo `#F4F7F9`, superfície `#FFFFFF`.
+- Gradiente Maré (marinho com luzes ciano e âmbar) só em áreas grandes e escuras.
+- Uma fonte só: **Geist** (interface, site e redes).
+- O site de lançamento já usa esta marca. O painel ainda usa a paleta antiga (amarelo e verde-petróleo, Onest) e deve migrar para esta.
 - Cada negócio pode trocar a cor principal, a cor de destaque, o fundo (claro ou escuro) e os cantos na aba Aparência. A interface calcula os tons suaves e a cor do texto para manter o contraste.
 - Celular primeiro. Alvos de toque com pelo menos 44 px.
 
