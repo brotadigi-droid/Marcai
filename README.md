@@ -26,3 +26,26 @@ Para aplicar as migrations e os dados de exemplo:
 ```bash
 npx supabase db push --include-seed
 ```
+
+## Configuração
+
+Copie `.env.example` para `.env.local` e preencha com o endereço e a chave pública (publishable) do projeto no Supabase.
+
+### Login por link mágico (Supabase)
+
+Em **Authentication → URL Configuration**:
+
+- **Site URL**: o endereço do site (ex.: `https://marcai.vercel.app`)
+- **Redirect URLs**: `http://localhost:3000/**` e `https://SEU-SITE/**`
+
+Para o link funcionar mesmo abrindo o e-mail em outro aparelho, em **Authentication → Emails → Magic Link**
+troque o link do modelo por:
+
+```
+{{ .SiteURL }}/auth/confirmar?token_hash={{ .TokenHash }}&type=email
+```
+
+### Publicar na Vercel
+
+Importe o repositório do GitHub na Vercel e adicione as variáveis
+`NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.

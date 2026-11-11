@@ -125,4 +125,39 @@ do $$ begin
   raise notice 'ok 10 - visitante anônimo não vê nada';
 end $$;
 
+-- 11 e 12. Primeiro acesso: criar_negocio cria o negócio com padrões e só uma vez
+reset role;
+insert into auth.users (id, email) values ('d0000000-0000-4000-8000-000000000002', 'nova@exemplo.com');
+set local role authenticated;
+set local request.jwt.claim.sub = 'd0000000-0000-4000-8000-000000000002';
+
+do $$
+declare v_id uuid;
+begin
+  v_id := public.criar_negocio('Unhas da Bia', 'unhas-da-bia', 'manicure');
+  if (select count(*) from public.servicos where negocio_id = v_id) <> 3
+     or (select count(*) from public.horarios_funcionamento where negocio_id = v_id) <> 5
+     or (select count(*) from public.negocios) <> 1 then
+    raise exception 'FALHOU: criar_negocio não montou o negócio com os padrões';
+  end if;
+  raise notice 'ok 11 - criar_negocio cria negócio, serviços e horários';
+end $$;
+
+do $$ begin
+  perform public.criar_negocio('Outro', 'outro-negocio', 'outro');
+  raise exception 'FALHOU: criou um segundo negócio';
+exception when raise_exception then
+  if sqlerrm like 'FALHOU%' then raise; end if;
+  raise notice 'ok 12 - só um negócio por usuário';
+end $$;
+
+reset role;
+set local role anon;
+do $$ begin
+  perform public.criar_negocio('Anônimo', 'anonimo', 'outro');
+  raise exception 'FALHOU: anônimo criou negócio';
+exception when insufficient_privilege then
+  raise notice 'ok 13 - anônimo não cria negócio';
+end $$;
+
 rollback;

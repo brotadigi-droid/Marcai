@@ -95,3 +95,27 @@ export function instanteLocal(data: string, minutos: number, fuso: string): Date
   t = comoUtc - deslocamentoMin(new Date(t), fuso) * 60000;
   return new Date(t);
 }
+
+/** Soma `n` dias a uma data AAAA-MM-DD. */
+export function somarDias(data: string, n: number): string {
+  const { ano, mes, dia } = lerData(data);
+  return new Date(Date.UTC(ano, mes - 1, dia + n)).toISOString().slice(0, 10);
+}
+
+/** Início (inclusive) e fim (exclusive) de um dia no fuso, como instantes. */
+export function limitesDoDia(data: string, fuso: string): { inicio: Date; fim: Date } {
+  return { inicio: instanteLocal(data, 0, fuso), fim: instanteLocal(somarDias(data, 1), 0, fuso) };
+}
+
+/** As 7 datas da semana (segunda a domingo) que contém `data`. */
+export function semanaDe(data: string): string[] {
+  const dow = diaDaSemana(data); // 0 = domingo
+  const segunda = somarDias(data, dow === 0 ? -6 : 1 - dow);
+  return Array.from({ length: 7 }, (_, i) => somarDias(segunda, i));
+}
+
+/** "HH:MM" de um instante, no fuso. */
+export function horaNoFuso(instante: Date, fuso: string): string {
+  const p = partesNoFuso(instante, fuso);
+  return paraHora(p.hora * 60 + p.minuto);
+}

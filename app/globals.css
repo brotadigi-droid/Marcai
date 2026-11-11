@@ -25,7 +25,25 @@
   --texto-suave: #4f5f5c;
   --sucesso: #1c6e45;
   --erro: #b3261e;
+  --canto-etiqueta: 8px;
+  --canto-botao: 12px;
+  --canto-cartao: 16px;
+  --canto-destaque: 24px;
   color-scheme: light;
+}
+
+[data-cantos="retos"] {
+  --canto-etiqueta: 3px;
+  --canto-botao: 4px;
+  --canto-cartao: 6px;
+  --canto-destaque: 8px;
+}
+
+[data-cantos="redondos"] {
+  --canto-etiqueta: 999px;
+  --canto-botao: 999px;
+  --canto-cartao: 24px;
+  --canto-destaque: 32px;
 }
 
 [data-tema="escuro"] {
@@ -59,6 +77,12 @@
   --color-sucesso: var(--sucesso);
   --color-erro: var(--erro);
 
+  /* Cantos: rounded-etiqueta, rounded-botao, rounded-cartao, rounded-destaque (mudam com data-cantos) */
+  --radius-etiqueta: var(--canto-etiqueta);
+  --radius-botao: var(--canto-botao);
+  --radius-cartao: var(--canto-cartao);
+  --radius-destaque: var(--canto-destaque);
+
   /* Fonte da interface */
   --font-sans: var(--font-onest), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
@@ -79,12 +103,6 @@
   --text-legenda: 13px;
   --text-legenda--line-height: 18px;
 
-  /* Cantos: rounded-etiqueta, rounded-botao, rounded-cartao, rounded-destaque */
-  --radius-etiqueta: 8px;
-  --radius-botao: 12px;
-  --radius-cartao: 16px;
-  --radius-destaque: 24px;
-
   /* Alvo de toque mínimo: min-h-toque, min-w-toque */
   --spacing-toque: 44px;
 }
@@ -95,6 +113,12 @@
 }
 @utility bg-noite {
   background-image: linear-gradient(160deg, #1a5556 0%, #0f3d3e 55%, #082526 100%);
+}
+
+/* O painel aplica o tema do negócio num elemento interno: ele precisa pintar o próprio fundo. */
+[data-tema] {
+  background: var(--fundo);
+  color: var(--texto);
 }
 
 body {
