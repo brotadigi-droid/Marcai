@@ -45,7 +45,7 @@ export default async function Hoje() {
 
       <section
         aria-labelledby="agora"
-        className="flex flex-col gap-4 rounded-destaque bg-petroleo p-5 text-sobre-petroleo md:p-6"
+        className="flex flex-col gap-4 rounded-destaque bg-marinho p-5 text-sobre-marinho md:p-6"
       >
         <h2 id="agora" className="text-legenda font-bold tracking-wide uppercase opacity-80">
           {atual.tipo === "atendendo"

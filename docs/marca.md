@@ -47,7 +47,7 @@ fundo #0A1628 · superficie #102038 · cinza-suave #18304E · linha #1E3555 · t
 
 ## Aparência personalizável
 Combinações prontas: Marinho e ciano (padrão, #0F2340/#14B8C4), Grafite e âmbar (#23272F/#FFB547), Verde e areia (#1E4D3A/#E9C46A), Vinho e rosé (#5B1A32/#F2A7B8), Petróleo e mostarda (#0F4C5C/#F2B33D), Azul e tangerina (#13203A/#FF7A3D).
-O app calcula a cor do texto pela luminância (texto escuro se luminância > 0,4) e os tons suaves misturando a cor com branco (70%) ou com a superfície escura.
+O app escolhe a cor do texto (marinho ou branco) pela que tiver mais contraste com o fundo e os tons suaves misturando a cor com branco (70%) ou com a superfície escura.
 
 ## Logo
 Um balão de conversa que também é uma folha de calendário, com um visto dentro. Caminho SVG (viewBox 0 0 64 64):

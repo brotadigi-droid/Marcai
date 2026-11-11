@@ -68,9 +68,9 @@ export async function carregarAgenda(
 
 /** Cor da etiqueta de horário conforme quem marcou. */
 export const COR_ORIGEM: Record<Origem, string> = {
-  ia: "bg-amarelo-suave",
+  ia: "bg-ciano-gelo",
   dono: "bg-cinza-suave",
-  link: "bg-menta-suave",
+  link: "bg-azul-suave",
 };
 
 export const NOME_ORIGEM: Record<Origem, string> = {

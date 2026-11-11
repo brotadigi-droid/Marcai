@@ -1,6 +1,6 @@
 import { corDoTexto, misturar, tomSuave } from "./cores";
 
-export const SUPERFICIE_ESCURA = "#122929";
+export const SUPERFICIE_ESCURA = "#102038";
 
 export type Aparencia = {
   cor_principal: string;
@@ -10,17 +10,17 @@ export type Aparencia = {
 };
 
 /**
- * Variáveis CSS do tema de um negócio. A cor principal vira --petroleo (estrutura)
- * e a de destaque vira --amarelo (botão principal); o texto sobre cada uma é calculado
+ * Variáveis CSS do tema de um negócio. A cor principal vira --marinho (estrutura)
+ * e a de destaque vira --ciano (botão principal); o texto sobre cada uma é calculado
  * pela luminância, e o tom suave mistura o destaque com branco ou com a superfície escura.
  */
 export function variaveisTema(a: Aparencia): Record<string, string> {
   return {
-    "--petroleo": a.cor_principal,
-    "--amarelo": a.cor_destaque,
-    "--sobre-petroleo": corDoTexto(a.cor_principal),
-    "--sobre-amarelo": corDoTexto(a.cor_destaque),
-    "--amarelo-suave":
+    "--marinho": a.cor_principal,
+    "--ciano": a.cor_destaque,
+    "--sobre-marinho": corDoTexto(a.cor_principal),
+    "--sobre-ciano": corDoTexto(a.cor_destaque),
+    "--ciano-gelo":
       a.fundo === "escuro"
         ? misturar(a.cor_destaque, SUPERFICIE_ESCURA, 0.72)
         : tomSuave(a.cor_destaque),

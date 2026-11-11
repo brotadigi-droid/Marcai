@@ -82,7 +82,7 @@ Detalhes em `docs/marca.md`. Resumo:
 - Direção corporativa e moderna, unissex. Cores: marinho `#0F2340` (estrutura, menu, mensagens da atendente), ciano `#14B8C4` (ação, botão principal), ciano-texto `#0B7F8A` (links sobre claro), ciano-gelo `#DFF6F7` (o que a atendente marcou), âmbar `#FFB547` (selo "Marcado", um por tela), fundo `#F4F7F9`, superfície `#FFFFFF`.
 - Gradiente Maré (marinho com luzes ciano e âmbar) só em áreas grandes e escuras.
 - Uma fonte só: **Geist** (interface, site e redes).
-- O site de lançamento já usa esta marca. O painel ainda usa a paleta antiga (amarelo e verde-petróleo, Onest) e deve migrar para esta.
+- O site de lançamento e o painel usam esta marca (tokens em `app/globals.css`: marinho, ciano, ciano-gelo, ambar, ambar-suave, azul-suave).
 - Cada negócio pode trocar a cor principal, a cor de destaque, o fundo (claro ou escuro) e os cantos na aba Aparência. A interface calcula os tons suaves e a cor do texto para manter o contraste.
 - Celular primeiro. Alvos de toque com pelo menos 44 px.
 

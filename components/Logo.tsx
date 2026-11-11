@@ -1,13 +1,13 @@
 type LogoProps = {
-  /** "claro": balão petróleo e visto amarelo. "escuro": balão amarelo e visto petróleo. */
+  /** "claro": balão marinho e visto ciano. "escuro": balão ciano e visto marinho. */
   fundo?: "claro" | "escuro";
   tamanho?: number;
   comNome?: boolean;
 };
 
 export function Logo({ fundo = "claro", tamanho = 36, comNome = true }: LogoProps) {
-  const balao = fundo === "claro" ? "#0F3D3E" : "#FFD23F";
-  const visto = fundo === "claro" ? "#FFD23F" : "#0F3D3E";
+  const balao = fundo === "claro" ? "#0F2340" : "#14B8C4";
+  const visto = fundo === "claro" ? "#14B8C4" : "#0F2340";
 
   return (
     <span className="inline-flex items-center gap-2.5">
@@ -28,8 +28,8 @@ export function Logo({ fundo = "claro", tamanho = 36, comNome = true }: LogoProp
       </svg>
       {comNome && (
         <b
-          className="text-[25px] font-extrabold tracking-[-0.045em]"
-          style={{ color: balao === "#FFD23F" ? "#FFFFFF" : "#0F3D3E" }}
+          className="text-[25px] font-semibold tracking-[-0.045em]"
+          style={{ color: fundo === "claro" ? "#0F2340" : "#FFFFFF" }}
         >
           marcaí
         </b>

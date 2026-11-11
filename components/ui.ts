@@ -1,10 +1,10 @@
 /** Classes reutilizadas na interface (Tailwind). Alvos de toque com pelo menos 44 px. */
 
 export const botaoPrincipal =
-  "inline-flex min-h-toque items-center justify-center gap-2 rounded-botao bg-amarelo px-5 font-bold text-sobre-amarelo transition hover:brightness-95 disabled:opacity-60";
+  "inline-flex min-h-toque items-center justify-center gap-2 rounded-botao bg-ciano px-5 font-bold text-sobre-ciano transition hover:brightness-95 disabled:opacity-60";
 
 export const botaoEstrutura =
-  "inline-flex min-h-toque items-center justify-center gap-2 rounded-botao bg-petroleo px-5 font-bold text-sobre-petroleo transition hover:brightness-110 disabled:opacity-60";
+  "inline-flex min-h-toque items-center justify-center gap-2 rounded-botao bg-marinho px-5 font-bold text-sobre-marinho transition hover:brightness-110 disabled:opacity-60";
 
 export const botaoSecundario =
   "inline-flex min-h-toque items-center justify-center gap-2 rounded-botao border-2 border-texto px-5 font-semibold text-texto transition hover:bg-cinza-suave disabled:opacity-60";

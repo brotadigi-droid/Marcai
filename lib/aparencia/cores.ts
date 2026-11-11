@@ -1,10 +1,10 @@
 /**
  * Regras de contraste da aba Aparência (docs/marca.md):
- * - texto escuro sobre cores com luminância acima de 0,4; branco nas demais;
+ * - o texto vai em marinho ou branco, o que tiver mais contraste (WCAG) com o fundo;
  * - tom suave = cor misturada com branco (72%).
  */
 
-export const PETROLEO = "#0F3D3E";
+export const MARINHO = "#0F2340";
 export const BRANCO = "#FFFFFF";
 
 function paraRgb(hex: string): [number, number, number] {
@@ -25,7 +25,10 @@ export function luminancia(hex: string): number {
 
 /** Cor do texto que vai por cima de `fundo`. */
 export function corDoTexto(fundo: string): string {
-  return luminancia(fundo) > 0.4 ? PETROLEO : BRANCO;
+  const l = luminancia(fundo);
+  const contrasteMarinho = (l + 0.05) / (luminancia(MARINHO) + 0.05);
+  const contrasteBranco = 1.05 / (l + 0.05);
+  return contrasteMarinho >= contrasteBranco ? MARINHO : BRANCO;
 }
 
 /** Mistura `a` com `b` na proporção `t` (0 = só a, 1 = só b). */

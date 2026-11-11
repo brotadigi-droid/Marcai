@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /*
- * Cores da marca Marcaí (docs/marca.md).
+ * Cores da marca Marcaí (docs/marca.md): marinho, ciano e âmbar.
  * Os tokens ficam em variáveis CSS para que, na Etapa 2, cada negócio
  * possa trocar a cor principal, o destaque, o fundo e os cantos.
  */
@@ -10,21 +10,23 @@
 @custom-variant dark (&:where([data-tema="escuro"], [data-tema="escuro"] *));
 
 :root {
-  --amarelo: #ffd23f;
-  --amarelo-suave: #fff1b8;
-  --petroleo: #0f3d3e;
-  --sobre-amarelo: #0f3d3e;
-  --sobre-petroleo: #ffffff;
-  --fundo: #f1f4f2;
+  --ciano: #14b8c4;
+  --ciano-gelo: #dff6f7;
+  --ciano-texto: #0b7f8a;
+  --marinho: #0f2340;
+  --sobre-ciano: #0f2340;
+  --sobre-marinho: #ffffff;
+  --ambar: #ffb547;
+  --ambar-suave: #fff1da;
+  --azul-suave: #e3ebf7;
+  --fundo: #f4f7f9;
   --superficie: #ffffff;
-  --cinza-suave: #e6eeea;
-  --menta-suave: #ddefe8;
-  --pessego-suave: #ffe3d3;
-  --linha: #dce5e1;
-  --texto: #0f3d3e;
-  --texto-suave: #4f5f5c;
-  --sucesso: #1c6e45;
-  --erro: #b3261e;
+  --cinza-suave: #e9eef2;
+  --linha: #dee6ec;
+  --texto: #0f2340;
+  --texto-suave: #55657a;
+  --sucesso: #12805c;
+  --erro: #c0362c;
   --canto-etiqueta: 8px;
   --canto-botao: 12px;
   --canto-cartao: 16px;
@@ -47,30 +49,33 @@
 }
 
 [data-tema="escuro"] {
-  --fundo: #0b1c1c;
-  --superficie: #122929;
-  --cinza-suave: #1c3637;
-  --linha: #234041;
-  --texto: #eef4f2;
-  --texto-suave: #9db2ae;
-  --amarelo-suave: #3a3112;
-  --menta-suave: #173a33;
-  --pessego-suave: #3f2a20;
+  --fundo: #0a1628;
+  --superficie: #102038;
+  --cinza-suave: #18304e;
+  --linha: #1e3555;
+  --texto: #eaf1f6;
+  --texto-suave: #9aaec2;
+  --ciano-texto: #5ed8e1;
+  --ciano-gelo: #0e3a44;
+  --ambar-suave: #3a2e14;
+  --azul-suave: #1a2c4a;
   color-scheme: dark;
 }
 
 @theme inline {
-  /* Cores: bg-amarelo, text-texto-suave, border-linha... */
-  --color-amarelo: var(--amarelo);
-  --color-amarelo-suave: var(--amarelo-suave);
-  --color-petroleo: var(--petroleo);
-  --color-sobre-amarelo: var(--sobre-amarelo);
-  --color-sobre-petroleo: var(--sobre-petroleo);
+  /* Cores: bg-ciano, text-texto-suave, border-linha... */
+  --color-ciano: var(--ciano);
+  --color-ciano-gelo: var(--ciano-gelo);
+  --color-ciano-texto: var(--ciano-texto);
+  --color-ambar: var(--ambar);
+  --color-marinho: var(--marinho);
+  --color-sobre-ciano: var(--sobre-ciano);
+  --color-sobre-marinho: var(--sobre-marinho);
   --color-fundo: var(--fundo);
   --color-superficie: var(--superficie);
   --color-cinza-suave: var(--cinza-suave);
-  --color-menta-suave: var(--menta-suave);
-  --color-pessego-suave: var(--pessego-suave);
+  --color-azul-suave: var(--azul-suave);
+  --color-ambar-suave: var(--ambar-suave);
   --color-linha: var(--linha);
   --color-texto: var(--texto);
   --color-texto-suave: var(--texto-suave);
@@ -84,20 +89,20 @@
   --radius-destaque: var(--canto-destaque);
 
   /* Fonte da interface */
-  --font-sans: var(--font-onest), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-sans: var(--font-geist), system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 @theme {
   /* Escala de texto: text-display, text-titulo, text-subtitulo, text-corpo, text-legenda */
   --text-display: 48px;
   --text-display--line-height: 52px;
-  --text-display--font-weight: 800;
+  --text-display--font-weight: 600;
   --text-titulo: 34px;
   --text-titulo--line-height: 40px;
-  --text-titulo--font-weight: 800;
+  --text-titulo--font-weight: 600;
   --text-subtitulo: 22px;
   --text-subtitulo--line-height: 28px;
-  --text-subtitulo--font-weight: 700;
+  --text-subtitulo--font-weight: 600;
   --text-corpo: 15px;
   --text-corpo--line-height: 22px;
   --text-legenda: 13px;
@@ -108,11 +113,14 @@
 }
 
 /* Gradientes (só em áreas grandes) */
-@utility bg-sol {
-  background-image: linear-gradient(135deg, #ffe27a 0%, #ffd23f 42%, #ffb38a 100%);
+@utility bg-gelo {
+  background-image: linear-gradient(160deg, #ffffff 0%, #eef8f9 55%, #dff6f7 100%);
 }
-@utility bg-noite {
-  background-image: linear-gradient(160deg, #1a5556 0%, #0f3d3e 55%, #082526 100%);
+@utility bg-mare {
+  background-image:
+    radial-gradient(60% 70% at 85% 10%, rgba(20, 184, 196, 0.55) 0%, rgba(20, 184, 196, 0) 70%),
+    radial-gradient(45% 55% at 20% 110%, rgba(255, 181, 71, 0.3) 0%, rgba(255, 181, 71, 0) 70%),
+    #0f2340;
 }
 
 /* O painel aplica o tema do negócio num elemento interno: ele precisa pintar o próprio fundo. */

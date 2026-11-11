@@ -11,7 +11,7 @@ async function AvisoErro({ busca }: { busca: Promise<{ erro?: string }> }) {
   const { erro } = await busca;
   if (erro !== "link") return null;
   return (
-    <p className="rounded-cartao bg-pessego-suave p-3 text-corpo">
+    <p className="rounded-cartao bg-ambar-suave p-3 text-corpo">
       Esse link expirou ou já foi usado. Peça um novo abaixo.
     </p>
   );
@@ -19,7 +19,7 @@ async function AvisoErro({ busca }: { busca: Promise<{ erro?: string }> }) {
 
 export default function Entrar({ searchParams }: PageProps<"/entrar">) {
   return (
-    <main className="flex flex-1 flex-col bg-sol">
+    <main className="flex flex-1 flex-col bg-gelo">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-8 px-4 py-10">
         <Logo />
         <div className="flex flex-col gap-5 rounded-destaque bg-superficie p-6 shadow-[8px_8px_0_rgba(15,61,62,.15)]">

@@ -123,8 +123,8 @@ export function Editor({
           style={variaveisTema(a) as React.CSSProperties}
           className="flex flex-col gap-3 rounded-destaque border border-linha p-4"
         >
-          <div className="flex items-center gap-2 rounded-cartao bg-petroleo p-3 text-sobre-petroleo">
-            <span className="grid size-8 place-items-center rounded-full bg-amarelo font-extrabold text-sobre-amarelo">
+          <div className="flex items-center gap-2 rounded-cartao bg-marinho p-3 text-sobre-marinho">
+            <span className="grid size-8 place-items-center rounded-full bg-ciano font-semibold text-sobre-ciano">
               {atendente.slice(0, 1).toUpperCase()}
             </span>
             <span className="truncate text-legenda font-semibold">
@@ -134,16 +134,16 @@ export function Editor({
           <p className="max-w-[85%] self-end rounded-destaque rounded-br-md bg-cinza-suave px-3 py-2 text-corpo">
             tem horário amanhã?
           </p>
-          <p className="max-w-[85%] rounded-destaque rounded-bl-md bg-petroleo px-3 py-2 text-corpo text-sobre-petroleo">
+          <p className="max-w-[85%] rounded-destaque rounded-bl-md bg-marinho px-3 py-2 text-corpo text-sobre-marinho">
             Tenho 10:00 ou 14:30. Qual fica melhor?
           </p>
           <div className="flex items-center gap-2 rounded-cartao border border-linha bg-superficie p-2.5">
-            <span className="rounded-etiqueta bg-amarelo-suave px-2 py-0.5 font-bold tabular-nums">
+            <span className="rounded-etiqueta bg-ciano-gelo px-2 py-0.5 font-bold tabular-nums">
               10:00
             </span>
             <span className="text-legenda">Carla, escova</span>
           </div>
-          <span className="inline-flex min-h-toque items-center justify-center rounded-botao bg-amarelo font-bold text-sobre-amarelo">
+          <span className="inline-flex min-h-toque items-center justify-center rounded-botao bg-ciano font-bold text-sobre-ciano">
             Marcar às 10:00
           </span>
         </div>

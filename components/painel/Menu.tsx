@@ -29,14 +29,14 @@ function Icone({ d }: { d: string }) {
   );
 }
 
-/** Menu do painel: barra embaixo no celular, coluna lateral em petróleo no computador. */
+/** Menu do painel: barra embaixo no celular, coluna lateral em marinho no computador. */
 export function Menu({ nomeNegocio }: { nomeNegocio?: string }) {
   const caminho = usePathname();
   const ativo = (href: string) => caminho === href || caminho.startsWith(`${href}/`);
 
   return (
     <>
-      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-8 bg-petroleo px-4 py-6 text-sobre-petroleo md:flex">
+      <aside className="fixed inset-y-0 left-0 hidden w-60 flex-col gap-8 bg-marinho px-4 py-6 text-sobre-marinho md:flex">
         <Link href="/hoje" className="px-2" aria-label="Marcaí, início">
           <Logo fundo="escuro" tamanho={30} />
         </Link>
@@ -47,7 +47,7 @@ export function Menu({ nomeNegocio }: { nomeNegocio?: string }) {
               key={i.href}
               href={i.href}
               aria-current={ativo(i.href) ? "page" : undefined}
-              className="flex min-h-toque items-center gap-3 rounded-botao px-3 font-semibold transition hover:bg-white/10 aria-[current=page]:bg-amarelo aria-[current=page]:text-sobre-amarelo"
+              className="flex min-h-toque items-center gap-3 rounded-botao px-3 font-semibold transition hover:bg-white/10 aria-[current=page]:bg-ciano aria-[current=page]:text-sobre-ciano"
             >
               <Icone d={i.icone} />
               {i.nome}
@@ -58,7 +58,7 @@ export function Menu({ nomeNegocio }: { nomeNegocio?: string }) {
 
       <nav
         aria-label="Painel"
-        className="fixed inset-x-0 bottom-0 z-20 flex border-t border-white/10 bg-petroleo pb-[env(safe-area-inset-bottom)] text-sobre-petroleo md:hidden"
+        className="fixed inset-x-0 bottom-0 z-20 flex border-t border-white/10 bg-marinho pb-[env(safe-area-inset-bottom)] text-sobre-marinho md:hidden"
       >
         {ITENS.map((i) => (
           <Link
@@ -67,7 +67,7 @@ export function Menu({ nomeNegocio }: { nomeNegocio?: string }) {
             aria-current={ativo(i.href) ? "page" : undefined}
             className="group flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-legenda font-semibold"
           >
-            <span className="flex h-8 w-14 items-center justify-center rounded-full transition group-aria-[current=page]:bg-amarelo group-aria-[current=page]:text-sobre-amarelo">
+            <span className="flex h-8 w-14 items-center justify-center rounded-full transition group-aria-[current=page]:bg-ciano group-aria-[current=page]:text-sobre-ciano">
               <Icone d={i.icone} />
             </span>
             {i.nome}

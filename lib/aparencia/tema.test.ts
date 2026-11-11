@@ -10,25 +10,25 @@ describe("variaveisTema", () => {
       fundo: "claro",
       cantos: "suaves",
     });
-    expect(v["--petroleo"]).toBe("#5B1A32");
-    expect(v["--sobre-petroleo"]).toBe("#FFFFFF");
-    expect(v["--sobre-amarelo"]).toBe("#0F3D3E");
+    expect(v["--marinho"]).toBe("#5B1A32");
+    expect(v["--sobre-marinho"]).toBe("#FFFFFF");
+    expect(v["--sobre-ciano"]).toBe("#0F2340");
   });
 
   it("tom suave claro no fundo claro e escuro no fundo escuro", () => {
     const claro = variaveisTema({
-      cor_principal: "#0F3D3E",
-      cor_destaque: "#FFD23F",
+      cor_principal: "#0F2340",
+      cor_destaque: "#14B8C4",
       fundo: "claro",
       cantos: "suaves",
     });
     const escuro = variaveisTema({
-      cor_principal: "#0F3D3E",
-      cor_destaque: "#FFD23F",
+      cor_principal: "#0F2340",
+      cor_destaque: "#14B8C4",
       fundo: "escuro",
       cantos: "suaves",
     });
-    expect(luminancia(claro["--amarelo-suave"])).toBeGreaterThan(0.6);
-    expect(luminancia(escuro["--amarelo-suave"])).toBeLessThan(0.1);
+    expect(luminancia(claro["--ciano-gelo"])).toBeGreaterThan(0.6);
+    expect(luminancia(escuro["--ciano-gelo"])).toBeLessThan(0.1);
   });
 });

@@ -1,26 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { BRANCO, PETROLEO, corDoTexto, luminancia, misturar, tomSuave } from "./cores";
+import { BRANCO, MARINHO, corDoTexto, luminancia, misturar, tomSuave } from "./cores";
 
 describe("cores da Aparência", () => {
-  it("usa texto petróleo sobre o amarelo da marca", () => {
-    expect(corDoTexto("#FFD23F")).toBe(PETROLEO);
+  it("usa texto marinho sobre o ciano da marca", () => {
+    expect(corDoTexto("#14B8C4")).toBe(MARINHO);
   });
 
-  it("usa texto branco sobre o petróleo da marca", () => {
-    expect(corDoTexto("#0F3D3E")).toBe(BRANCO);
+  it("usa texto branco sobre o marinho da marca", () => {
+    expect(corDoTexto("#0F2340")).toBe(BRANCO);
   });
 
   it("acerta o texto das combinações prontas", () => {
     const prontas = [
-      ["#0F4C5C", "#F2B33D"],
-      ["#1B2F5B", "#FF9F43"],
+      ["#0F2340", "#14B8C4"],
+      ["#23272F", "#FFB547"],
       ["#1E4D3A", "#E9C46A"],
       ["#5B1A32", "#F2A7B8"],
-      ["#2B2F36", "#5CC8D7"],
+      ["#0F4C5C", "#F2B33D"],
     ];
     for (const [principal, destaque] of prontas) {
       expect(corDoTexto(principal)).toBe(BRANCO);
-      expect(corDoTexto(destaque)).toBe(PETROLEO);
+      expect(corDoTexto(destaque)).toBe(MARINHO);
     }
   });
 

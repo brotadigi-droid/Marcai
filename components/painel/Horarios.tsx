@@ -101,7 +101,7 @@ export function LinhaBloqueioItem({
   diaInteiro: boolean;
 }) {
   return (
-    <li className="flex items-center gap-3 rounded-cartao border border-dashed border-linha bg-pessego-suave p-3">
+    <li className="flex items-center gap-3 rounded-cartao border border-dashed border-linha bg-ambar-suave p-3">
       <span className="rounded-etiqueta bg-superficie px-2 py-1 font-bold tabular-nums">
         {diaInteiro ? "Dia" : horaNoFuso(b.inicio, fuso)}
       </span>
@@ -129,7 +129,7 @@ export function Legenda() {
   return (
     <p className="flex flex-wrap gap-x-4 gap-y-1 text-legenda text-texto-suave">
       <span className="flex items-center gap-1.5">
-        <i className="inline-block size-3 rounded-sm border border-texto/30 bg-amarelo-suave" />{" "}
+        <i className="inline-block size-3 rounded-sm border border-texto/30 bg-ciano-gelo" />{" "}
         pela atendente
       </span>
       <span className="flex items-center gap-1.5">
@@ -137,7 +137,7 @@ export function Legenda() {
         você
       </span>
       <span className="flex items-center gap-1.5">
-        <i className="inline-block size-3 rounded-sm border border-texto/30 bg-menta-suave" /> pelo
+        <i className="inline-block size-3 rounded-sm border border-texto/30 bg-azul-suave" /> pelo
         link
       </span>
     </p>

@@ -56,7 +56,7 @@ export default async function Marcar({ searchParams }: PageProps<"/agenda/marcar
             servicos.map((s) => (
               <label
                 key={s.id}
-                className="flex min-h-toque cursor-pointer items-center gap-3 rounded-botao border border-linha bg-superficie px-3 has-checked:border-texto has-checked:bg-amarelo-suave"
+                className="flex min-h-toque cursor-pointer items-center gap-3 rounded-botao border border-linha bg-superficie px-3 has-checked:border-texto has-checked:bg-ciano-gelo"
               >
                 <input
                   type="radio"
@@ -115,7 +115,7 @@ export default async function Marcar({ searchParams }: PageProps<"/agenda/marcar
                   {disp.horarios.map((h) => (
                     <label
                       key={h}
-                      className="flex min-h-toque cursor-pointer items-center justify-center rounded-botao border border-linha bg-superficie font-semibold tabular-nums has-checked:border-petroleo has-checked:bg-petroleo has-checked:text-sobre-petroleo"
+                      className="flex min-h-toque cursor-pointer items-center justify-center rounded-botao border border-linha bg-superficie font-semibold tabular-nums has-checked:border-marinho has-checked:bg-marinho has-checked:text-sobre-marinho"
                     >
                       <input type="radio" name="hora" value={h} required className="sr-only" />
                       {h}

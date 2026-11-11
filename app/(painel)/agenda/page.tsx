@@ -77,7 +77,7 @@ export default async function Agenda({ searchParams }: PageProps<"/agenda">) {
               key={d}
               href={`/agenda?dia=${d}`}
               aria-current={d === dia ? "date" : undefined}
-              className="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-botao border border-transparent bg-superficie py-2 text-center transition hover:border-linha aria-[current=date]:bg-petroleo aria-[current=date]:text-sobre-petroleo"
+              className="flex min-h-16 flex-col items-center justify-center gap-0.5 rounded-botao border border-transparent bg-superficie py-2 text-center transition hover:border-linha aria-[current=date]:bg-marinho aria-[current=date]:text-sobre-marinho"
             >
               <span className="text-legenda uppercase opacity-80">
                 {DIAS_CURTOS[diaDaSemana(d)]}

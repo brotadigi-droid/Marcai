@@ -10,7 +10,7 @@ values
    'Rua Voluntários da Pátria, 120, Botafogo, Rio de Janeiro', 'Lia',
    'acolhedor e próximo, como uma recepcionista querida pelas clientes',
    'Tolerância de 15 minutos. Coloração precisa de teste de mecha 48 horas antes, sem custo.',
-   '#0F3D3E', '#FFD23F'),
+   '#0F2340', '#14B8C4'),
   ('b0000000-0000-4000-8000-000000000001', 'Barbearia do Zé', 'barbearia-do-ze', 'barbearia',
    'Rua Conde de Bonfim, 210, Tijuca, Rio de Janeiro', 'Lia',
    'descontraído e direto, pode usar "fala" e "fechou", sem exagerar nas gírias',
