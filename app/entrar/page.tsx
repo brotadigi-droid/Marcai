@@ -22,7 +22,7 @@ export default function Entrar({ searchParams }: PageProps<"/entrar">) {
     <main className="flex flex-1 flex-col bg-gelo">
       <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-8 px-4 py-10">
         <Logo />
-        <div className="flex flex-col gap-5 rounded-destaque bg-superficie p-6 shadow-[8px_8px_0_rgba(15,61,62,.15)]">
+        <div className="flex flex-col gap-5 rounded-destaque bg-superficie p-6 shadow-[0_24px_48px_-24px_rgba(15,35,64,.35)]">
           <div>
             <h1 className="text-titulo">Entrar no painel</h1>
             <p className="mt-1 text-corpo text-texto-suave">
